@@ -182,7 +182,7 @@ class deployhub {
 					else
 					{
 				 	if (data.result)
-				 		return [true,"Move the Application '" + Application + "' from '" + FromDomain + "' using the '" + Task + "' Task"];				
+				 		return [true,"Moved Application '" + Application + "' from '" + FromDomain + "'"];				
 				 	else
 				 	 return [false,"Could not move the Application '" + Application + "' from '" + FromDomain + "' using the '" + Task + "' Task"];				
 					}
