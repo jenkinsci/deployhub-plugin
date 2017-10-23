@@ -180,7 +180,12 @@ class deployhub {
 					if (data.size() == 0)
 					 return [false,"Could not move the Application '" + Application + "' from '" + FromDomain + "' using the '" + Task + "' Task"];
 					else
-					 return [true, data];	 
+					{
+				 	if (data.result)
+				 		return [true,"Move the Application '" + Application + "' from '" + FromDomain + "' using the '" + Task + "' Task"];				
+				 	else
+				 	 return [false,"Could not move the Application '" + Application + "' from '" + FromDomain + "' using the '" + Task + "' Task"];				
+					}
 				}
 				
 				def deployApplication(String url, String userid, String pw, String Application, String Environment)
