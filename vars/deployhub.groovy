@@ -126,13 +126,17 @@ class deployhub {
             return null;    
         }    
         
-        def jsonSlurper = new groovy.json.JsonSlurper();
-        return jsonSlurper.parseText(body);
+        return jsonParse(body);
         
   //      println("Request ($verb):\n  URL: $requestUrl\n  JSON: $json");    
   //      println("Response:\n  HTTP Status: $statusCode\n  Message: $message\n  Response Body: $body");      
     } 
     
+				@NonCPS
+				def jsonParse(def json) {
+				    new groovy.json.JsonSlurperClassic().parseText(json)
+				}
+				
     def boolean login(String url, String userid, String pw)
     {
      this.url = url;
