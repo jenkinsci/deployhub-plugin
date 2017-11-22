@@ -219,7 +219,13 @@ class deployhub {
      if (data.size() == 0)
       return [false, "Could not get log #" + deployid];
      
-					return [true,data['logoutput']];
+					def lines = data['logoutput'];
+					def output = "";
+					
+					lines.each {
+						output += ${it} + "\n";
+					} 
+					return [true,output];
 				}
 				
     def approveApplication(String url, String userid, String pw, String Application)
