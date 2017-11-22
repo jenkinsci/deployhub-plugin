@@ -222,9 +222,10 @@ class deployhub {
 					def lines = data['logoutput'];
 					def output = "";
 					
-					lines.each {
-						output += ${it} + "\n";
-					} 
+					for (i = 0; i < lines.size(); i++) {
+					  output += lines[i] + "\n";
+					}
+
 					return [true,output];
 				}
 				
