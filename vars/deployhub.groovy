@@ -222,6 +222,7 @@ class deployhub {
 					def lines = data['logoutput'];
 					def output = "";
 					
+					def i = 0;
 					for (i = 0; i < lines.size(); i++) {
 					  output += lines[i] + "\n";
 					}
