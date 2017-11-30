@@ -200,7 +200,7 @@ class deployhub {
        return [false,"Could not login to " + url];
      }
 
-     def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/deploy/" + enc(Application) + "/" + enc(Environment) + "&wait=N");
+     def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/deploy/" + enc(Application) + "/" + enc(Environment));
      if (data.size() == 0)
       return [false, "Could not Deploy Application '" + Application + "' to Environment '" + Environment + "'"];
      else
