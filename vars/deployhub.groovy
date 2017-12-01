@@ -229,7 +229,22 @@ class deployhub {
 
 					return [true,output];
 				}
-				
+
+    def isDeploymentDone(String url, String userid, String pw, String deployid)
+    {
+     if (this.url.length() == 0)
+     {
+      if (!login(url,userid,pw))
+       return [false,"Could not login to " + url];
+     }
+
+     def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/log/" + deployid + "?checkcomplete=Y");
+     if (data.size() == 0)
+      return [false, "Could not get log #" + deployid];
+
+					return [true,data];
+				}
+								
     def approveApplication(String url, String userid, String pw, String Application)
     {
      if (this.url.length() == 0)
