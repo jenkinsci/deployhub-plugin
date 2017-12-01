@@ -11,6 +11,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.net.URLEncoder;
 
 import javax.xml.parsers.DocumentBuilder;
 // for XML parsing
@@ -61,7 +62,7 @@ public abstract class Common implements Action, ModelObjectWithContextMenu {
         XmlFile t = new XmlFile(Hudson.XSTREAM, new File(rootDir, "org.jenkinsci.plugins.deployhub.DeployHub.xml"));
         if (t != null && t.exists()) {
                 try {   
-                        DeployHubRecorder.DescriptorImpl desc = (DeployHubRecorder.DescriptorImpl)t.read();
+                        DeployHub.DescriptorImpl desc = (DeployHub.DescriptorImpl)t.read();
                   
                         if (desc != null) return desc.getServerURL();
                         return "";
@@ -116,11 +117,14 @@ public abstract class Common implements Action, ModelObjectWithContextMenu {
 					if (username != null && password != null) {
 						System.out.println("username="+username.getTextContent());	
 						System.out.println("password="+password.getTextContent());
-						String url=baseurl+"/dmadminweb/API/XXXuser="+username.getTextContent()+"&pass="+password.getTextContent();
+						String encodedPassword = URLEncoder.encode(password.getTextContent(),"UTF-8");
+						String url=baseurl+"/dmadminweb/API/XXXuser="+username.getTextContent()+"&pass="+encodedPassword;
 						res.put(url,directories[i]);
 					}
 				}
 			}
+		} catch (RuntimeException ex) {
+			throw ex;
 		} catch(Exception ex) {
 			System.out.println("Exception ex = "+ex.getMessage());
 		}
