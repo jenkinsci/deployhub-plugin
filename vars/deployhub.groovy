@@ -219,7 +219,7 @@ class deployhub {
 					
 					while (done == 0)
 					{
-				  def res = this.isDeploymentDone(url, user, pw, "$deployid");
+				  def res = this.isDeploymentDone(url, userid, pw, "$deployid");
 					
 					 if (res[0])
 					 {
