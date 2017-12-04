@@ -215,6 +215,32 @@ class deployhub {
        return [false,"Could not login to " + url];
      }
 
+					def done = 0;
+					
+					while (done == 0)
+					{
+				  def res = this.isDeploymentDone(url, user, pw, "$deployid");
+					
+					 if (res[0])
+					 {
+						 def s = res[1];
+
+					  if (res[1]['success'] && res[1]['iscomplete'])
+							{
+							 done = 1;
+							}
+							else
+							{
+							 sleep 10
+							}
+					 }
+						else
+						{
+						 echo res[1];
+							done = 1;
+						}
+					}	
+					
      def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/log/" + deployid);
      if (data.size() == 0)
       return [false, "Could not get log #" + deployid];
