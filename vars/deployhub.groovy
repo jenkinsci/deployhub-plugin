@@ -132,11 +132,11 @@ class deployhub {
   //      println("Response:\n  HTTP Status: $statusCode\n  Message: $message\n  Response Body: $body");      
     } 
     
-				@NonCPS
-				def jsonParse(def json) {
-				    new groovy.json.JsonSlurperClassic().parseText(json)
-				}
-				
+    @NonCPS
+    def jsonParse(def json) {
+        new groovy.json.JsonSlurperClassic().parseText(json)
+    }
+    
     def boolean login(String url, String userid, String pw)
     {
      this.url = url;
@@ -192,30 +192,27 @@ class deployhub {
      }
     }
     
-				def forceDeployIfNeeded(String url, String userid, String pw, String Environment)
-				{
-					def data = this.ServersInEnvironment(url, userid, pw, Environment);
-					
-					def servers = data[1]['result']['servers'];
+    def forceDeployIfNeeded(String url, String userid, String pw, String Environment)
+    {
+     def data = ServersInEnvironment(url,userid,pw,Environment);
+     
+     def servers = data[1]['result']['servers'];
 
-					def i = 0;
-					for (i = 0; i < servers.size(); i++) 
-					{
-						def id = servers[i]['id'];
-						
-						data =this.ServerRunning(url, userid, pw,"$id");
-						
-						def running = data[1]['result']['data'][0][4];
-						
-						if (!running)
-						{
-							doGetHttpRequestWithJson("${url}/dmadminweb/API/mod/server/$id/?force=y");
-						}
-					}
+     def i = 0;
+     for (i = 0; i < servers.size(); i++) 
+     {
+      def id = servers[i]['id'];
+      data = ServerRunning(url,userid,pw,"$id");
+      
+      def running = data[1]['result']['data'][0][4];
 
-				}
-				
-				def ServersInEnvironment(String url, String userid, String pw, String Environment)
+      if (running.equalsIgnoreCase("false"))
+         doGetHttpRequestWithJson("http://rocket:8080/dmadminweb/API/mod/server/$id/?force=y");
+
+     }
+    }
+    
+    def ServersInEnvironment(String url, String userid, String pw, String Environment)
     {
      if (this.url.length() == 0)
      {
@@ -229,7 +226,7 @@ class deployhub {
      else
       return [true,data];
     }
-				
+    
     def ServerRunning(String url, String userid, String pw, String server)
     {
      if (this.url.length() == 0)
@@ -244,7 +241,7 @@ class deployhub {
      else
       return [true,data];
     }
-				
+    
     def deployApplication(String url, String userid, String pw, String Application, String Environment)
     {
      if (this.url.length() == 0)
@@ -268,46 +265,46 @@ class deployhub {
        return [false,"Could not login to " + url];
      }
 
-					def done = 0;
-					
-					while (done == 0)
-					{
-				  def res = this.isDeploymentDone(url, userid, pw, "$deployid");
-					
-					 if (res[0])
-					 {
-						 def s = res[1];
+     def done = 0;
+     
+     while (done == 0)
+     {
+      def res = this.isDeploymentDone(url, userid, pw, "$deployid");
+     
+      if (res[0])
+      {
+       def s = res[1];
 
-					  if (res[1]['success'] && res[1]['iscomplete'])
-							{
-							 done = 1;
-							}
-							else
-							{
-							 sleep 10
-							}
-					 }
-						else
-						{
-						 echo res[1];
-							done = 1;
-						}
-					}	
-					
+       if (res[1]['success'] && res[1]['iscomplete'])
+       {
+        done = 1;
+       }
+       else
+       {
+        sleep 10
+       }
+      }
+      else
+      {
+       echo res[1];
+       done = 1;
+      }
+     } 
+     
      def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/log/" + deployid);
      if (data.size() == 0)
       return [false, "Could not get log #" + deployid];
      
-					def lines = data['logoutput'];
-					def output = "";
-					
-					def i = 0;
-					for (i = 0; i < lines.size(); i++) {
-					  output += lines[i] + "\n";
-					}
+     def lines = data['logoutput'];
+     def output = "";
+     
+     def i = 0;
+     for (i = 0; i < lines.size(); i++) {
+       output += lines[i] + "\n";
+     }
 
-					return [true,output];
-				}
+     return [true,output];
+    }
 
     def isDeploymentDone(String url, String userid, String pw, String deployid)
     {
@@ -321,9 +318,9 @@ class deployhub {
      if (data.size() == 0)
       return [false, "Could not get log #" + deployid];
 
-					return [true,data];
-				}
-								
+     return [true,data];
+    }
+        
     def approveApplication(String url, String userid, String pw, String Application)
     {
      if (this.url.length() == 0)
