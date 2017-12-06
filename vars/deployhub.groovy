@@ -192,6 +192,29 @@ class deployhub {
      }
     }
     
+				def forceDeployIfNeeded(String url, String userid, String pw, String Environment)
+				{
+					def data = dh.ServersInEnvironment(url, userid, pw, Environment);
+					
+					def servers = data[1]['result']['servers'];
+
+					def i = 0;
+					for (i = 0; i < servers.size(); i++) 
+					{
+						def id = servers[i]['id'];
+						
+						data = dh.ServerRunning(url, userid, pw,"$id");
+						
+						def running = data[1]['result']['data'][0][4];
+						
+						if (!running)
+						{
+							doGetHttpRequestWithJson("${url}/dmadminweb/API/mod/server/$id/?force=y");
+						}
+					}
+
+				}
+				
 				def ServersInEnvironment(String url, String userid, String pw, String Environment)
     {
      if (this.url.length() == 0)
