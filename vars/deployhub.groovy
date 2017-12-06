@@ -192,6 +192,21 @@ class deployhub {
      }
     }
     
+				def ServersInEnvironment(String url, String userid, String pw, String Environment)
+    {
+     if (this.url.length() == 0)
+     {
+      if (!login(url,userid,pw))
+       return [false,"Could not login to " + url];
+     }
+
+     def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/environment/" + enc(Environment));
+     if (data.size() == 0)
+      return [false, "Could not test server '" + server];
+     else
+      return [true,data];
+    }
+				
     def ServerRunning(String url, String userid, String pw, String server)
     {
      if (this.url.length() == 0)
