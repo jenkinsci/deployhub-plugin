@@ -194,7 +194,7 @@ class deployhub {
     
 				def forceDeployIfNeeded(String url, String userid, String pw, String Environment)
 				{
-					def data = dh.ServersInEnvironment(url, userid, pw, Environment);
+					def data = this.ServersInEnvironment(url, userid, pw, Environment);
 					
 					def servers = data[1]['result']['servers'];
 
@@ -203,7 +203,7 @@ class deployhub {
 					{
 						def id = servers[i]['id'];
 						
-						data = dh.ServerRunning(url, userid, pw,"$id");
+						data =this.ServerRunning(url, userid, pw,"$id");
 						
 						def running = data[1]['result']['data'][0][4];
 						
