@@ -37,8 +37,7 @@ class deployhub {
             String c = entry.getValue();
 												if  (c.contains("p1=") || c.contains("p2="))
 												{
-              cookie += c + "; ";
-														error(c);
+              cookie = c;
 												}		
           }
          }     
@@ -107,7 +106,8 @@ class deployhub {
         HttpURLConnection connection = url.openConnection();    
 
         connection.setRequestMethod(verb);    
-        connection.setRequestProperty("Content-Type", "application/json");   
+        connection.setRequestProperty("Content-Type", "application/json"); 
+								error(cookie);  
         if (cookie.length() > 0)
 								{
           connection.setRequestProperty("Cookie", cookie); 
