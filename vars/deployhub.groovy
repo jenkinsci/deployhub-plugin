@@ -26,18 +26,19 @@ class deployhub {
             this.body = connection.getErrorStream().text;    
         }
         
+								def headerFields = connection.getHeaderFields()
+								error(headerFields);
+								
         if (cookie.length() == 0)
         {            
          String headerName=null;
-         String h="";
+
          for (int i=1; (headerName = connection.getHeaderFieldKey(i))!=null; i++) {
-										h = h + "\n" + headerName;
           if (headerName.equals("Set-Cookie")) {                  
             String c = connection.getHeaderField(i); 
             cookie += c + "; ";
           }
          }
-									error(h);  
         }    
     }   
     
