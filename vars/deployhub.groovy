@@ -35,10 +35,10 @@ class deployhub {
           if (entry.getKey() != null && entry.getKey().equalsIgnoreCase("Set-Cookie")) 
           {                  
             String c = entry.getValue();
-												if  (c.contains("p1=") || c.contains("p2="))
-												{
+            if  (c.contains("p1=") || c.contains("p2="))
+            {
               cookie = c;
-												}		
+            }  
           }
          }     
         } */
@@ -129,11 +129,7 @@ class deployhub {
             error("\n$verb to URL: $requestUrl\n    JSON: $json\n    HTTP Status: $statusCode\n    Message: $message\n    Response Body: $body");
             return null;    
         }   
-								
-								if (requestUrl.contains("applic"))
-         error("\n$verb to URL: $requestUrl\n    JSON: $json\n    HTTP Status: $statusCode\n    Message: $message\n    Response Body: $body");
-								  
-        
+                
         return jsonParse(body);
         
   //      println("Request ($verb):\n  URL: $requestUrl\n  JSON: $json");    
