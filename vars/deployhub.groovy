@@ -26,7 +26,7 @@ class deployhub {
             this.body = connection.getErrorStream().text;    
         }
         
-        Map<String, List<String>> map = connection.getHeaderFields();
+/*        Map<String, List<String>> map = connection.getHeaderFields();
         
         if (cookie.length() == 0)
         { 
@@ -37,11 +37,11 @@ class deployhub {
             String c = entry.getValue();
 												if  (c.contains("p1=") || c.contains("p2="))
 												{
-              cookie = "p1=admin; p2=admin;";
+              cookie = c;
 												}		
           }
          }     
-        }
+        } */
     }   
     
     def doGetHttpRequest(String requestUrl){    
@@ -107,10 +107,7 @@ class deployhub {
 
         connection.setRequestMethod(verb);    
         connection.setRequestProperty("Content-Type", "application/json"); 
-        if (cookie.length() > 0)
-								{
-          connection.setRequestProperty("Cookie", cookie); 
-								}		
+        connection.setRequestProperty("Cookie", "p1=$user; p2=$pw"); 
         connection.doOutput = true;    
 
         if (json.length() > 0)
