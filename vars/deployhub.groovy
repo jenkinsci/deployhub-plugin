@@ -37,7 +37,7 @@ class deployhub {
             String c = entry.getValue();
 												if  (c.contains("p1=") || c.contains("p2="))
 												{
-              cookie = c;
+              cookie = "p1=admin; p2=admin;";
 												}		
           }
          }     
