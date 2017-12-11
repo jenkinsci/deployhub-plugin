@@ -133,7 +133,7 @@ class deployhub {
             return null;    
         }   
 								
-								if (requestURL.contains("applic"))
+								if (requestUrl.contains("applic"))
          error("\n$verb to URL: $requestUrl\n    JSON: $json\n    HTTP Status: $statusCode\n    Message: $message\n    Response Body: $body");
 								  
         
