@@ -32,7 +32,7 @@ class deployhub {
         { 
 									for (Map.Entry<String, List<String>> entry : map.entrySet()) 
 									{
-          if (entry.getKey().equalsIgnoreCase("Set-Cookie")) 
+          if (entry.getKey() != null && entry.getKey().equalsIgnoreCase("Set-Cookie")) 
 										{                  
             String c = entry.getValue();
             cookie += c + "; ";
