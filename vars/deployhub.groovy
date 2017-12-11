@@ -29,13 +29,15 @@ class deployhub {
         if (cookie.length() == 0)
         {            
          String headerName=null;
-        
+         String h="";
          for (int i=1; (headerName = connection.getHeaderFieldKey(i))!=null; i++) {
+										h = h + "\n" + headerName;
           if (headerName.equals("Set-Cookie")) {                  
             String c = connection.getHeaderField(i); 
             cookie += c + "; ";
           }
-         }  
+         }
+									error(h);  
         }    
     }   
     
@@ -120,7 +122,6 @@ class deployhub {
 
         //parse the response    
         parseResponse(connection);    
-        error("\n$verb to URL: $requestUrl\n    JSON: $json\n    HTTP Status: $statusCode\n    Message: $message\n    Response Body: $body");
 
         if(failure){    
             error("\n$verb to URL: $requestUrl\n    JSON: $json\n    HTTP Status: $statusCode\n    Message: $message\n    Response Body: $body");
