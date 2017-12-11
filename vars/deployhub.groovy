@@ -43,7 +43,6 @@ class deployhub {
           }
          }     
         }
-								error(cookie);    
     }   
     
     def doGetHttpRequest(String requestUrl){    
