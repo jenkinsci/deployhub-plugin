@@ -243,23 +243,13 @@ class deployhub {
         def s = res[1];
 
         if (res[1]['success'] && res[1]['iscomplete'])
-        {
          done = 1;
-        }
-        else
-        {
-         sleep 10
-        }
        }
        else
-       {
         done = 1;
-       }
       }
-      else
-      {
-       sleep 10
-      }
+      
+						sleep(10000); // 10 seconds
      } 
      
      def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/log/" + deployid);
