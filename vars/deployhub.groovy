@@ -26,16 +26,15 @@ class deployhub {
             this.body = connection.getErrorStream().text;    
         }
         
-								error("cookie=" + cookie.length() )
-								
         if (cookie.length() == 0)
         {            
          String headerName=null;
 
          for (int i=1; (headerName = connection.getHeaderFieldKey(i))!=null; i++) {
-          if (headerName.equals("Set-Cookie")) {                  
+          if (headerName.contains("Set-Cookie")) {                  
             String c = connection.getHeaderField(i); 
             cookie += c + "; ";
+												error(c);
           }
          }
         }    
