@@ -26,18 +26,18 @@ class deployhub {
             this.body = connection.getErrorStream().text;    
         }
         
-								Map<String, List<String>> map = connection.getHeaderFields();
-								
+        Map<String, List<String>> map = connection.getHeaderFields();
+        
         if (cookie.length() == 0)
         { 
-									for (Map.Entry<String, List<String>> entry : map.entrySet()) 
-									{
+         for (Map.Entry<String, List<String>> entry : map.entrySet()) 
+         {
           if (entry.getKey() != null && entry.getKey().equalsIgnoreCase("Set-Cookie")) 
-										{                  
+          {                  
             String c = entry.getValue();
             cookie += c + "; ";
           }
-									}     
+         }     
         }    
     }   
     
@@ -328,10 +328,9 @@ class deployhub {
      if (this.url.length() == 0)
      {
       if (!login(url,userid,pw))
-       return [false,"Could not login to " + url];	
+       return [false,"Could not login to " + url]; 
      }
-					return[false,this.url.length()];
-					
+    
      // Get appid
      def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/application/" + enc(Application));
 
