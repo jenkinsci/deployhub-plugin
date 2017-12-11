@@ -328,7 +328,7 @@ class deployhub {
       if (!login(url,userid,pw))
        return [false,"Could not login to " + url];
      }
-					return[false,this.cookie];
+					return[false,this.url.length()];
 					
      // Get appid
      def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/application/" + enc(Application));
