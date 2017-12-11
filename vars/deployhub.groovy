@@ -70,24 +70,24 @@ class deployhub {
      * Gets the json content to the given url and ensures a 200 or 201 status on the response.    
      * If a negative status is returned, an error will be raised and the pipeline will fail.    
      */    
-    def Object doGetHttpRequestWithJson(String requestUrl){    
-        return doHttpRequestWithJson("", requestUrl, "GET");    
+    def Object doGetHttpRequestWithJson(String userid, String pw, String requestUrl){    
+        return doHttpRequestWithJson(userid,pw,"", requestUrl, "GET");    
     } 
 
     /**    
      * Posts the json content to the given url and ensures a 200 or 201 status on the response.    
      * If a negative status is returned, an error will be raised and the pipeline will fail.    
      */    
-    def Object doPostHttpRequestWithJson(String json, String requestUrl){    
-        return doHttpRequestWithJson(json, requestUrl, "POST");    
+    def Object doPostHttpRequestWithJson(String userid, String pw, String json, String requestUrl){    
+        return doHttpRequestWithJson(userid,pw,json, requestUrl, "POST");    
     }    
 
     /**    
      * Posts the json content to the given url and ensures a 200 or 201 status on the response.    
      * If a negative status is returned, an error will be raised and the pipeline will fail.    
      */    
-    def Object doPutHttpRequestWithJson(String json, String requestUrl){    
-        return doHttpRequestWithJson(json, requestUrl, "PUT");    
+    def Object doPutHttpRequestWithJson(String userid, String pw, String json, String requestUrl){    
+        return doHttpRequestWithJson(userid,pw,json, requestUrl, "PUT");    
     }
 
     /**    
@@ -100,7 +100,7 @@ class deployhub {
      return java.net.URLEncoder.encode(p, "UTF-8");
     }
     
-    def Object doHttpRequestWithJson(String json, String requestUrl, String verb){ 
+    def Object doHttpRequestWithJson(String userid, String pw, String json, String requestUrl, String verb){ 
           
         URL url = new URL(requestUrl);    
         HttpURLConnection connection = url.openConnection();    
@@ -141,34 +141,19 @@ class deployhub {
         new groovy.json.JsonSlurperClassic().parseText(json)
     }
     
-    def boolean login(String url, String userid, String pw)
-    {
-     this.url = url;
-     this.userid = userid;
-     this.pw = pw;
-     
-     def res = doGetHttpRequestWithJson("${url}/dmadminweb/API/login?user=" + enc(userid) + "&pass=" + enc(pw));
-     
-     return res.success;
-    }
-    
+   
     def moveApplication(String url, String userid, String pw, String Application, String FromDomain, String Task)
     {
-     if (this.url.length() == 0)
-     {
-      if (!login(url,userid,pw))
-       return [false,"Could not login to " + url];
-     }
      // Get appid
-     def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/application/" + enc(Application));
+     def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/application/" + enc(Application));
      def appid = data.result.id;
      
      // Get from domainid
-     data = doGetHttpRequestWithJson("${url}/dmadminweb/API/domain/" + enc(FromDomain));
+     data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/domain/" + enc(FromDomain));
      def fromid = data.result.id;
      
      // Get from Tasks
-     data = doGetHttpRequestWithJson("${url}/dmadminweb/GetTasks?domainid=" + fromid);
+     data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/GetTasks?domainid=" + fromid);
      if (data.size() == 0)
       return [false,"Could not move the Application '" + Application + "' from '" + FromDomain + "' using the '" + Task + "' Task"];
 
@@ -184,7 +169,7 @@ class deployhub {
       }
       
      // Move App Version
-     data = doGetHttpRequestWithJson("${url}/dmadminweb/RunTask?f=run&tid=" + taskid + "&notes=&id=" + appid + "&pid=" + fromid);
+     data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/RunTask?f=run&tid=" + taskid + "&notes=&id=" + appid + "&pid=" + fromid);
      if (data.size() == 0)
       return [false,"Could not move the Application '" + Application + "' from '" + FromDomain + "' using the '" + Task + "' Task"];
      else
@@ -211,20 +196,14 @@ class deployhub {
       def running = data[1]['result']['data'][0][4];
 
       if (running.equalsIgnoreCase("false"))
-         doGetHttpRequestWithJson("${url}/dmadminweb/API/mod/server/$id/?force=y");
+         doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/mod/server/$id/?force=y");
 
      }
     }
     
     def ServersInEnvironment(String url, String userid, String pw, String Environment)
     {
-     if (this.url.length() == 0)
-     {
-      if (!login(url,userid,pw))
-       return [false,"Could not login to " + url];
-     }
-
-     def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/environment/" + enc(Environment));
+     def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/environment/" + enc(Environment));
      if (data.size() == 0)
       return [false, "Could not test server '" + server];
      else
@@ -233,13 +212,7 @@ class deployhub {
     
     def ServerRunning(String url, String userid, String pw, String server)
     {
-     if (this.url.length() == 0)
-     {
-      if (!login(url,userid,pw))
-       return [false,"Could not login to " + url];
-     }
-
-     def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/testserver/" + enc(server));
+     def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/testserver/" + enc(server));
      if (data.size() == 0)
       return [false, "Could not test server '" + server];
      else
@@ -248,13 +221,7 @@ class deployhub {
     
     def deployApplication(String url, String userid, String pw, String Application, String Environment)
     {
-     if (this.url.length() == 0)
-     {
-      if (!login(url,userid,pw))
-       return [false,"Could not login to " + url];
-     }
-
-     def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/deploy/" + enc(Application) + "/" + enc(Environment) + "?wait=N");
+     def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/deploy/" + enc(Application) + "/" + enc(Environment) + "?wait=N");
      if (data.size() == 0)
       return [false, "Could not Deploy Application '" + Application + "' to Environment '" + Environment + "'"];
      else
@@ -263,12 +230,6 @@ class deployhub {
 
     def getLogs(String url, String userid, String pw, String deployid)
     {
-     if (this.url.length() == 0)
-     {
-      if (!login(url,userid,pw))
-       return [false,"Could not login to " + url];
-     }
-
      def done = 0;
      
      while (done == 0)
@@ -301,8 +262,8 @@ class deployhub {
       }
      } 
      
-     def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/log/" + deployid);
-					error(data);
+     def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/log/" + deployid);
+
      if (data == null || data.size() == 0)
       return [false, "Could not get log #" + deployid];
      
@@ -319,13 +280,7 @@ class deployhub {
 
     def isDeploymentDone(String url, String userid, String pw, String deployid)
     {
-     if (this.url.length() == 0)
-     {
-      if (!login(url,userid,pw))
-       return [false,"Could not login to " + url];
-     }
-
-     def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/log/" + deployid + "?checkcomplete=Y");
+     def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/log/" + deployid + "?checkcomplete=Y");
      
      if (data == null)
       return [false, "Could not get log #" + deployid];
@@ -338,19 +293,13 @@ class deployhub {
         
     def approveApplication(String url, String userid, String pw, String Application)
     {
-     if (this.url.length() == 0)
-     {
-      if (!login(url,userid,pw))
-       return [false,"Could not login to " + url]; 
-     }
-    
      // Get appid
-     def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/application/" + enc(Application));
+     def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/application/" + enc(Application));
 
      def appid = data.result.id;
      
      // Approve appid
-     data = doGetHttpRequestWithJson("${url}/dmadminweb/API/approve/" + appid);
+     data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/approve/" + appid);
      if (data.size() == 0)
       return [false, "Could not Approve Application '" + Application + "'"];
      else
