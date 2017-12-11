@@ -275,23 +275,30 @@ class deployhub {
      {
       def res = this.isDeploymentDone(url, userid, pw, "$deployid");
      
-      if (res[0])
+      if (res != null)
       {
-       def s = res[1];
-
-       if (res[1]['success'] && res[1]['iscomplete'])
+       if (res[0])
        {
-        done = 1;
+        def s = res[1];
+
+        if (res[1]['success'] && res[1]['iscomplete'])
+        {
+         done = 1;
+        }
+        else
+        {
+         sleep 10
+        }
        }
        else
        {
-        sleep 10
+        echo res[1];
+        done = 1;
        }
       }
       else
       {
-       echo res[1];
-       done = 1;
+       sleep 10
       }
      } 
      
@@ -319,7 +326,11 @@ class deployhub {
      }
 
      def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/log/" + deployid + "?checkcomplete=Y");
-     if (data.size() == 0)
+     
+     if (data == null)
+      return [false, "Could not get log #" + deployid];
+            
+     if (data != null && data.size() == 0)
       return [false, "Could not get log #" + deployid];
 
      return [true,data];
