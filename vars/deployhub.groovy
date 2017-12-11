@@ -107,7 +107,7 @@ class deployhub {
 
         connection.setRequestMethod(verb);    
         connection.setRequestProperty("Content-Type", "application/json"); 
-        connection.setRequestProperty("Cookie", "p1=$user; p2=$pw"); 
+        connection.setRequestProperty("Cookie", "p1=$userid; p2=$pw"); 
         connection.doOutput = true;    
 
         if (json.length() > 0)
