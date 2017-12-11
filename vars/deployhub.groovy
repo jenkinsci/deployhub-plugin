@@ -28,18 +28,17 @@ class deployhub {
         
 								Map<String, List<String>> map = connection.getHeaderFields();
 								
-								error(map);
-								
         if (cookie.length() == 0)
-        {            
-         String headerName=null;
-
-         for (int i=1; (headerName = connection.getHeaderFieldKey(i))!=null; i++) {
-          if (headerName.contains("Set-Cookie")) {                  
-            String c = connection.getHeaderField(i); 
+        { 
+									for (Map.Entry<String, List<String>> entry : map.entrySet()) 
+									{
+          if (entry.getKey().equalsIgnoreCase("Set-Cookie")) 
+										{                  
+            String c = entry.getValue();
             cookie += c + "; ";
           }
-         }
+									}
+									error(cookie);           
         }    
     }   
     
