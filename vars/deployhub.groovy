@@ -207,7 +207,7 @@ class deployhub {
       def running = data[1]['result']['data'][0][4];
 
       if (running.equalsIgnoreCase("false"))
-         doGetHttpRequestWithJson("http://rocket:8080/dmadminweb/API/mod/server/$id/?force=y");
+         doGetHttpRequestWithJson("${url}/dmadminweb/API/mod/server/$id/?force=y");
 
      }
     }
@@ -332,6 +332,8 @@ class deployhub {
      // Get appid
      def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/application/" + enc(Application));
      def appid = data.result.id;
+					
+					return[false,data];
      
      // Approve appid
      data = doGetHttpRequestWithJson("${url}/dmadminweb/API/approve/" + appid);
