@@ -37,8 +37,7 @@ class deployhub {
             String c = entry.getValue();
             cookie += c + "; ";
           }
-									}
-									error(cookie);           
+									}     
         }    
     }   
     
