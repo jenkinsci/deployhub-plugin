@@ -32,7 +32,7 @@ class deployhub {
         { 
          for (Map.Entry<String, List<String>> entry : map.entrySet()) 
          {
-          if (entry.getKey() != null && entry.getKey().equalsIgnoreCase("Set-Cookie")) 
+          if (entry.getKey() != null && entry.getKey().equalsIgnoreCase("Set-Cookie") && entry.getValue().contains("p1=") || entry.getValue().contains("p2=")) 
           {                  
             String c = entry.getValue();
             cookie += c + "; ";
@@ -105,7 +105,10 @@ class deployhub {
         connection.setRequestMethod(verb);    
         connection.setRequestProperty("Content-Type", "application/json");   
         if (cookie.length() > 0)
+								{
           connection.setRequestProperty("Cookie", cookie); 
+										error(cookie)
+								}		
         connection.doOutput = true;    
 
         if (json.length() > 0)
