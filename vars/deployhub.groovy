@@ -109,7 +109,6 @@ class deployhub {
 
         connection.setRequestMethod(verb);    
         connection.setRequestProperty("Content-Type", "application/json"); 
-								error(cookie);  
         if (cookie.length() > 0)
 								{
           connection.setRequestProperty("Cookie", cookie); 
