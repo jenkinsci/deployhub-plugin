@@ -120,6 +120,7 @@ class deployhub {
 
         //parse the response    
         parseResponse(connection);    
+        error("\n$verb to URL: $requestUrl\n    JSON: $json\n    HTTP Status: $statusCode\n    Message: $message\n    Response Body: $body");
 
         if(failure){    
             error("\n$verb to URL: $requestUrl\n    JSON: $json\n    HTTP Status: $statusCode\n    Message: $message\n    Response Body: $body");
@@ -326,7 +327,7 @@ class deployhub {
      if (this.url.length() == 0)
      {
       if (!login(url,userid,pw))
-       return [false,"Could not login to " + url];
+       return [false,"Could not login to " + url];	
      }
 					return[false,this.url.length()];
 					
