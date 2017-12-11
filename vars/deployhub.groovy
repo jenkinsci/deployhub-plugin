@@ -26,7 +26,7 @@ class deployhub {
             this.body = connection.getErrorStream().text;    
         }
         
-								String cook = conn.getHeaderField("Set-Cookie");
+								String cook = connection.getHeaderField("Set-Cookie");
 								error(cook);
 								
         if (cookie.length() == 0)
