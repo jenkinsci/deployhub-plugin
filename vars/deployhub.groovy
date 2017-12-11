@@ -42,8 +42,6 @@ class deployhub {
           }
          }     
         }
-								
-								error("here=" + cookie);
     }   
     
     def doGetHttpRequest(String requestUrl){    
@@ -111,6 +109,7 @@ class deployhub {
         connection.setRequestProperty("Content-Type", "application/json"); 
         if (cookie.length() > 0)
 								{
+																	error("here=" + cookie);
           connection.setRequestProperty("Cookie", cookie); 
 								}		
         connection.doOutput = true;    
