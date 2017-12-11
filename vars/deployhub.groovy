@@ -331,7 +331,7 @@ class deployhub {
 
      // Get appid
      def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/application/" + enc(Application));
-					return[false,data];
+					return[false,cookie];
      def appid = data.result.id;
      
      // Approve appid
