@@ -303,7 +303,7 @@ class deployhub {
      } 
      
      def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/log/" + deployid);
-     if (data.size() == 0)
+     if (data == null || data.size() == 0)
       return [false, "Could not get log #" + deployid];
      
      def lines = data['logoutput'];
