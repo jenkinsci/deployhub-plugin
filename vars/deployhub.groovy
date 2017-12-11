@@ -26,9 +26,6 @@ class deployhub {
             this.body = connection.getErrorStream().text;    
         }
         
-								def headerFields = connection.getHeaderFields()
-								error(headerFields);
-								
         if (cookie.length() == 0)
         {            
          String headerName=null;
@@ -36,6 +33,7 @@ class deployhub {
          for (int i=1; (headerName = connection.getHeaderFieldKey(i))!=null; i++) {
           if (headerName.equals("Set-Cookie")) {                  
             String c = connection.getHeaderField(i); 
+												error(c);
             cookie += c + "; ";
           }
          }
