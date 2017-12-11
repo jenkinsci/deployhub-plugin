@@ -292,7 +292,6 @@ class deployhub {
        }
        else
        {
-        echo res[1];
         done = 1;
        }
       }
@@ -303,6 +302,7 @@ class deployhub {
      } 
      
      def data = doGetHttpRequestWithJson("${url}/dmadminweb/API/log/" + deployid);
+					error(data);
      if (data == null || data.size() == 0)
       return [false, "Could not get log #" + deployid];
      
