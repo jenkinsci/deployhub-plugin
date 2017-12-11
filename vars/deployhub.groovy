@@ -109,7 +109,6 @@ class deployhub {
         connection.setRequestProperty("Content-Type", "application/json"); 
         if (cookie.length() > 0)
 								{
-																	error("here=" + cookie);
           connection.setRequestProperty("Cookie", cookie); 
 								}		
         connection.doOutput = true;    
@@ -132,7 +131,11 @@ class deployhub {
         if(failure){    
             error("\n$verb to URL: $requestUrl\n    JSON: $json\n    HTTP Status: $statusCode\n    Message: $message\n    Response Body: $body");
             return null;    
-        }    
+        }   
+								
+								if (cookie.length() > 0)
+         error("\n$verb to URL: $requestUrl\n    JSON: $json\n    HTTP Status: $statusCode\n    Message: $message\n    Response Body: $body");
+								  
         
         return jsonParse(body);
         
