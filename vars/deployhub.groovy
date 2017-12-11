@@ -38,7 +38,8 @@ class deployhub {
             cookie += c + "; ";
           }
          }     
-        }    
+        }
+								error(cookie);    
     }   
     
     def doGetHttpRequest(String requestUrl){    
@@ -107,7 +108,6 @@ class deployhub {
         if (cookie.length() > 0)
 								{
           connection.setRequestProperty("Cookie", cookie); 
-										error(cookie)
 								}		
         connection.doOutput = true;    
 
