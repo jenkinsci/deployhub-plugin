@@ -16,8 +16,9 @@ class deployhub {
 				  matcher ? matcher[0][1] : null
 				}
 				
-				def getURL(env) {
-					return _getURL(readFile("${env.JENKINS_HOME}/org.jenkinsci.plugins.deployhub.DeployHub.xml"));
+				def getURL(home) {
+					def config = "$home/org.jenkinsci.plugins.deployhub.DeployHub.xml";
+					return _getURL(readFile(config));
 				}
 				
     def String msg() {
