@@ -10,6 +10,16 @@ class deployhub {
     boolean failure = false;
     
  
+				@NonCPS
+				def _getURL(text) {
+				  def matcher = text =~ '<serverURL>(.+)</serverURL>'
+				  matcher ? matcher[0][1] : null
+				}
+				
+				def getURL() {
+					return _getURL(readFile("${env.JENKINS_HOME}/org.jenkinsci.plugins.deployhub.DeployHub.xml"));
+				}
+				
     def String msg() {
      return "Loading dhactions";
     }
