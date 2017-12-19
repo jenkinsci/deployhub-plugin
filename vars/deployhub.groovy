@@ -18,7 +18,7 @@ class deployhub {
 				
 				def getURL(env) {
 					def config = "${env.JENKINS_HOME}/org.jenkinsci.plugins.deployhub.DeployHub.xml";
-					return _getURL(readFile(config));
+					return _getURL(new File(config).text);
 				}
 				
     def String msg() {
