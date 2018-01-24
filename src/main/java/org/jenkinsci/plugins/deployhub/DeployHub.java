@@ -347,13 +347,7 @@ public class DeployHub extends Recorder {
 
 			boolean newVersionCreated = false;
 			
-			//
-			// Are we deploying anything?
-			// --------------------------
-			//
-			if (getDeployApplication()) {
-				// Yes we're going to deploy the app
-				System.out.println("Deploy Application is set");
+	
 				//
 				// Find version to deploy
 				// ----------------------
@@ -615,6 +609,13 @@ public class DeployHub extends Recorder {
 				urlstr = server + "/dmadminweb/API/buildnotify?buildurl="+URLEncoder.encode(buildurl,"UTF-8");
 				res = SendMessage(listener,cm,urlstr);
 				System.out.println("res="+res.toString());
+		  //
+	   // Are we deploying anything?
+	   // --------------------------
+	   //
+	   if (getDeployApplication()) {
+	    // Yes we're going to deploy the app
+	    System.out.println("Deploy Application is set");
 				//
 				// Step 5 - Application ready to deploy
 				// ------------------------------------
