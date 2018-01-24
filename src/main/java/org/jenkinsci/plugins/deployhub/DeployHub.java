@@ -514,7 +514,8 @@ public class DeployHub extends Recorder {
 						int newcompid = newcomp.getInt("id");
 						String newcompname = newcomp.getString("name");
 						listener.getLogger().println("New Component Version "+newcomp.getString("name")+" created");
-						if (newVersionCreated) {
+			// Always replace the component with the new one (for micro services)			
+			//			if (newVersionCreated) {  
 							// Need to replace the old component in the new application with this newly
 							// created component
 							urlstr = server + "/dmadminweb/API/replace/"+appid+"/"+compid+"/"+newcompid;
@@ -524,7 +525,7 @@ public class DeployHub extends Recorder {
 								return false;
 							}
 							listener.getLogger().println("Component "+compname+" replaced with new version "+newcompname+" in Application "+appname);
-						}
+		//				}
 						comp = newcomp;
 						compid = newcompid;
 						compname = newcompname;
