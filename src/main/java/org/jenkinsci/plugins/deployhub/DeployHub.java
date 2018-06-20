@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.net.CookieStore;
-import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,6 +22,10 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
@@ -38,9 +40,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
 
 public class DeployHub extends Recorder {
 
@@ -232,39 +232,31 @@ public class DeployHub extends Recorder {
 	}
 
 
-	private JSONArray getJA(JSONObject x,String y) {
-		JSONArray ja = null;
-		try {
-			ja = x.getJSONArray(y);
-		} catch(JSONException ex) {
-			ja = null;
-		}
+	private JsonArray getJA(JsonObject x,String y) {
+		JsonArray ja = null;
+		ja = x.getAsJsonArray(y);
 		return ja;
 	}
 
-	private JSONObject getJO(JSONObject x,String y) {
-		JSONObject jo = null;
-		try {
-			jo = x.getJSONObject(y);
-			if (jo.isNullObject()) jo = null;
-		} catch(JSONException ex) {
-			jo = null;
-		}
+	private JsonObject getJO(JsonObject x,String y) {
+		JsonObject jo = null;
+		jo = x.getAsJsonObject(y);
 		return jo;
 	}
 
-	private JSONObject SendMessage(BuildListener listener,CookieManager cm,String urlstr)
+	private JsonObject SendMessage(BuildListener listener,CookieManager cm,String urlstr)
 	{
 		if (debug) listener.getLogger().println("DEBUG: "+urlstr);
-		JSONObject err = new JSONObject();
-		err.element("success",false);
+		JsonObject err = new JsonObject();
+		err.addProperty("success",false);
 		try {
 			URL url = new URL(urlstr);
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept","application/json");
 			if (conn.getResponseCode() != 200) {
-				return err.element("error",conn.getResponseCode());
+			 err.addProperty("error",conn.getResponseCode());
+				return err;
 			}
 
       String reply="";
@@ -277,15 +269,17 @@ public class DeployHub extends Recorder {
 			}
 			reply = buf.toString(); 
 			br.close();
-			JSONObject res=JSONObject.fromObject(reply);
+			JsonObject res=(JsonObject) new JsonParser().parse(reply);
 			conn.disconnect();
 			return res;
 		}
 		catch(MalformedURLException ex) {
-			return err.element("error","Malformed URL: "+urlstr);
+   err.addProperty("error","Malformed URL: "+urlstr);
+			return err;
 		}
 		catch(IOException ex) {
-			return err.element("error","IO Exception: "+ex.getMessage());
+		 err.addProperty("error","IO Exception: "+ex.getMessage());
+			return err;
 		}
 	}
 
@@ -332,16 +326,16 @@ public class DeployHub extends Recorder {
 			+"?user="+URLEncoder.encode(username, "UTF-8")
 			+"&pass="+URLEncoder.encode(password, "UTF-8");
 			//listener.getLogger().println("DEBUG: urlstr="+urlstr);
-			JSONObject res = SendMessage(listener,cm,urlstr);
+			JsonObject res = SendMessage(listener,cm,urlstr);
 			//listener.getLogger().println("JSON Result = "+res.toString());
-			if (res.getBoolean("success") == false) {
+			if (res.getAsJsonPrimitive("success").getAsBoolean() == false) {
 				listener.getLogger().print("Failed to login to DeployHub as user "+username+":");
-				listener.getLogger().println(res.getString("error"));
+				listener.getLogger().println(res.getAsJsonPrimitive("error").getAsString());
 				return false;
 			}
 			listener.getLogger().println("Logged in to DeployHub as user "+username);
 
-			JSONObject app = null;
+			JsonObject app = null;
 			int appid = 0;
 			String appname = null;
 
@@ -367,14 +361,14 @@ public class DeployHub extends Recorder {
 					urlstr = server + "/dmadminweb/API/application/"
 					+URLEncoder.encode(expapp,"UTF-8");
 				}
-				JSONObject a = SendMessage(listener,cm,urlstr);
-				if (a.getBoolean("success") == false) {
-					listener.getLogger().println(a.getString("error"));
+				JsonObject a = SendMessage(listener,cm,urlstr);
+				if (a.getAsJsonPrimitive("success").getAsBoolean() == false) {
+					listener.getLogger().println(a.getAsJsonPrimitive("error").getAsString());
 					return false;
 				}
 				app = getJO(a,"result");
-				appid = app.getInt("id");
-				appname = app.getString("name");
+				appid = app.getAsJsonPrimitive("id").getAsInt();
+				appname = app.getAsJsonPrimitive("name").getAsString();
 				if (debug) listener.getLogger().println("appid="+appid);
 				//
 				// Do we need to create a new app version?
@@ -382,7 +376,7 @@ public class DeployHub extends Recorder {
 				//
 				if (getCreateNewVersion()) {
 					// Check if the latest version is approved
-					JSONArray applist = getJA(app,"approvals");
+					JsonArray applist = getJA(app,"approvals");
 					if (applist.size() > 0) {
 						// It's got at least one approval - create new version
 						listener.getLogger().println("Application "+appname+" is approved - creating new version");
@@ -390,15 +384,15 @@ public class DeployHub extends Recorder {
 						urlstr = server + "/dmadminweb/API/newappver/"
 						+appid
 						+"?taskname="+URLEncoder.encode(getTaskname(),"UTF-8");
-						JSONObject na = SendMessage(listener,cm,urlstr);
-						if (na.getBoolean("success") == false) {
-							listener.getLogger().println(na.getString("error"));
+						JsonObject na = SendMessage(listener,cm,urlstr);
+						if (na.getAsJsonPrimitive("success").getAsBoolean() == false) {
+							listener.getLogger().println(na.getAsJsonPrimitive("error").getAsString());
 							return false;
 						}
 						app = getJO(na,"result");
 						System.out.println("app is "+app);
-						appid = app.getInt("id");
-						appname = app.getString("name");
+		    appid = app.getAsJsonPrimitive("id").getAsInt();
+		    appname = app.getAsJsonPrimitive("name").getAsString();
 						System.out.println("appid="+appid+" appname="+appname);
 						listener.getLogger().println("New Application Version "+appname+" created");
 						newVersionCreated = true;
@@ -417,22 +411,22 @@ public class DeployHub extends Recorder {
 					}
 					// Find the version of this component associated with this application
 					urlstr = server + "/dmadminweb/API/component/"+URLEncoder.encode(cn,"UTF-8");
-					JSONObject c = SendMessage(listener,cm,urlstr);
-					if (c.getBoolean("success") == false) {
-						listener.getLogger().println(c.getString("error"));
+					JsonObject c = SendMessage(listener,cm,urlstr);
+					if (c.getAsJsonPrimitive("success").getAsBoolean() == false) {
+						listener.getLogger().println(c.getAsJsonPrimitive("error").getAsString());
 						return false;
 					}
-					JSONObject comp = getJO(c,"result");
-					String compname = comp.getString("name");
-					int compid = comp.getInt("id");
-					JSONArray cvs = getJA(comp,"versions");
+					JsonObject comp = getJO(c,"result");
+					String compname = comp.getAsJsonPrimitive("name").getAsString();
+					int compid = comp.getAsJsonPrimitive("id").getAsInt();
+					JsonArray cvs = getJA(comp,"versions");
 					ArrayList<Integer> compids = new ArrayList<Integer>();
 					compids.add(compid);
 					if (cvs != null) {
 						// Base version specified - add the versions
 						for (int i = 0; i < cvs.size(); i++) {
-							JSONObject c2 = cvs.getJSONObject(i);
-							compids.add(c2.getInt("id"));
+							JsonObject c2 = cvs.get(i).getAsJsonObject();
+							compids.add(c2.getAsJsonPrimitive("id").getAsInt());
 						}
 					}
 					if (debug) listener.getLogger().println("compids="+compids);
@@ -441,20 +435,20 @@ public class DeployHub extends Recorder {
 					// See if any of these IDs are associated with this application
 					//
 					if (debug) listener.getLogger().println("app="+app);
-					JSONArray appcomps = getJA(app,"components");
+					JsonArray appcomps = getJA(app,"components");
 					compid=0;
 					if (debug) listener.getLogger().println("appcomps="+appcomps);
 					if (appcomps != null) {
 						for (int i = 0; i < appcomps.size(); i++) {
-							JSONObject ac = appcomps.getJSONObject(i);
+							JsonObject ac = appcomps.get(i).getAsJsonObject();
 							if (debug) listener.getLogger().println("ac="+ac);
-							int aci = ac.getInt("id");
+							int aci = ac.getAsJsonPrimitive("id").getAsInt();
 							if (debug) listener.getLogger().println("aci="+aci);
 							int mc = compids.indexOf(aci);
 							if (mc>=0) {
 								// Match
 								compid = compids.get(mc);
-								compname = ac.getString("name");
+								compname = ac.getAsJsonPrimitive("name").getAsString();
 								listener.getLogger().println("Component "+compname+" is associated with application "+appname);
 								break;
 							} 
@@ -469,14 +463,14 @@ public class DeployHub extends Recorder {
 					// Get the details for this matched component
 					//
 					urlstr = server + "/dmadminweb/API/component/"+compid;
-					JSONObject cx = SendMessage(listener,cm,urlstr);
-					if (cx.getBoolean("success") == false) {
-						listener.getLogger().println(cx.getString("error"));
+					JsonObject cx = SendMessage(listener,cm,urlstr);
+					if (cx.getAsJsonPrimitive("success").getAsBoolean() == false) {
+						listener.getLogger().println(cx.getAsJsonPrimitive("error").getAsString());
 						return false;
 					}
 					comp = getJO(cx,"result");
-					compname = comp.getString("name");
-					compid = comp.getInt("id");
+					compname = comp.getAsJsonPrimitive("name").getAsString();
+					compid = comp.getAsJsonPrimitive("id").getAsInt();
 					//
 					// If we've created a new application version then we need to create a new component version and
 					// associate it with this new application version. If we've NOT created a new application version
@@ -486,15 +480,15 @@ public class DeployHub extends Recorder {
 					boolean CreateNewComponentVersion=false;
 					if (!newVersionCreated) {
 						// Check to see if any of the applications associated with this component are approved
-						JSONArray applist = getJA(comp,"applications");
+						JsonArray applist = getJA(comp,"applications");
 						if (applist != null) {
 							for (int i = 0; i < applist.size(); i++) {
-								JSONObject ta = applist.getJSONObject(i);
+								JsonObject ta = applist.get(i).getAsJsonObject();
 								if (debug) listener.getLogger().println("ta="+ta);
-								JSONArray tapp = getJA(ta,"approvals");
+								JsonArray tapp = getJA(ta,"approvals");
 								if (tapp != null && tapp.size() > 0) {
 									// This app has been approved
-									listener.getLogger().println("Component "+comp.getString("name")+" is associated with an approved application "+ta.getString("name"));
+									listener.getLogger().println("Component "+comp.getAsJsonPrimitive("name").getAsString()+" is associated with an approved application "+ta.getAsJsonPrimitive("name").getAsString());
 									CreateNewComponentVersion=true;
 									break;
 								}
@@ -505,23 +499,23 @@ public class DeployHub extends Recorder {
 						// Need to create a new component version
 						urlstr = server + "/dmadminweb/API/newcompver/"
 						+compid;
-						JSONObject nc = SendMessage(listener,cm,urlstr);
-						if (nc.getBoolean("success") == false) {
-							listener.getLogger().println(nc.getString("error"));
+						JsonObject nc = SendMessage(listener,cm,urlstr);
+						if (nc.getAsJsonPrimitive("success").getAsBoolean() == false) {
+							listener.getLogger().println(nc.getAsJsonPrimitive("error").getAsString());
 							return false;
 						}
-						JSONObject newcomp = getJO(nc,"result");
-						int newcompid = newcomp.getInt("id");
-						String newcompname = newcomp.getString("name");
-						listener.getLogger().println("New Component Version "+newcomp.getString("name")+" created");
+						JsonObject newcomp = getJO(nc,"result");
+						int newcompid = newcomp.getAsJsonPrimitive("id").getAsInt();
+						String newcompname = newcomp.getAsJsonPrimitive("name").getAsString();
+						listener.getLogger().println("New Component Version "+newcomp.getAsJsonPrimitive("name").getAsString()+" created");
 			// Always replace the component with the new one (for micro services)			
 			//			if (newVersionCreated) {  
 							// Need to replace the old component in the new application with this newly
 							// created component
 							urlstr = server + "/dmadminweb/API/replace/"+appid+"/"+compid+"/"+newcompid;
 							nc = SendMessage(listener,cm,urlstr);
-							if (nc.getBoolean("success") == false) {
-								listener.getLogger().println(nc.getString("error"));
+							if (nc.getAsJsonPrimitive("success").getAsBoolean() == false) {
+								listener.getLogger().println(nc.getAsJsonPrimitive("error").getAsString());
 								return false;
 							}
 							listener.getLogger().println("Component "+compname+" replaced with new version "+newcompname+" in Application "+appname);
@@ -557,9 +551,9 @@ public class DeployHub extends Recorder {
 								+compid
 								+"?name="+URLEncoder.encode(expname,"UTF-8")
 								+"&value="+URLEncoder.encode(expvalue,"UTF-8");;
-								JSONObject res2 = SendMessage(listener,cm,urlstr);
-								if (res2.getBoolean("success") == false) {
-									listener.getLogger().println(res2.getString("error"));
+								JsonObject res2 = SendMessage(listener,cm,urlstr);
+								if (res2.getAsJsonPrimitive("success").getAsBoolean() == false) {
+									listener.getLogger().println(res2.getAsJsonPrimitive("error").getAsString());
 									return false;
 								}
 							}
@@ -594,9 +588,9 @@ public class DeployHub extends Recorder {
 							+appid
 							+"?name="+URLEncoder.encode(expname,"UTF-8")
 							+"&value="+URLEncoder.encode(expvalue,"UTF-8");;
-							JSONObject res2 = SendMessage(listener,cm,urlstr);
-							if (res2.getBoolean("success") == false) {
-								listener.getLogger().println(res2.getString("error"));
+							JsonObject res2 = SendMessage(listener,cm,urlstr);
+							if (res2.getAsJsonPrimitive("success").getAsBoolean() == false) {
+								listener.getLogger().println(res2.getAsJsonPrimitive("error").getAsString());
 								return false;
 							}
 						} catch(JSONException ex) {
@@ -630,27 +624,27 @@ public class DeployHub extends Recorder {
 				+ appid
 				+"?env="+URLEncoder.encode(expenv,"UTF-8")
 				+"&wait="+waitstr;
-				JSONObject depres = SendMessage(listener,cm,urlstr);
-				if (depres.getBoolean("success") == false) {
-					listener.getLogger().println(depres.getString("error"));
+				JsonObject depres = SendMessage(listener,cm,urlstr);
+				if (depres.getAsJsonPrimitive("success").getAsBoolean() == false) {
+					listener.getLogger().println(depres.getAsJsonPrimitive("error").getAsString());
 					return false;
 				}
-				int deploymentid = depres.getInt("deploymentid");
+				int deploymentid = depres.getAsJsonPrimitive("deploymentid").getAsInt();
 				if (wait) {
 					//
 					// We are set to wait - we will only return to here when the deployment is complete
 					// --------------------------------------------------------------------------------
 					//
 					urlstr = server + "/dmadminweb/API/log?id=" + deploymentid;
-					JSONObject logres = SendMessage(listener,cm,urlstr);
-					if (logres.getBoolean("success") == false) {
-						listener.getLogger().println(logres.getString("error"));
+					JsonObject logres = SendMessage(listener,cm,urlstr);
+					if (logres.getAsJsonPrimitive("success").getAsBoolean() == false) {
+						listener.getLogger().println(logres.getAsJsonPrimitive("error").getAsString());
 						return false;
 					}
-					JSONArray logoutput = getJA(logres,"logoutput");
+					JsonArray logoutput = getJA(logres,"logoutput");
 					if (logoutput != null) {
 						for (int i = 0; i < logoutput.size(); i++) {
-							String logline = logoutput.getString(i);
+							String logline = logoutput.get(i).getAsString();
 							listener.getLogger().println(logline);
 						}
 					} else {
@@ -671,12 +665,12 @@ public class DeployHub extends Recorder {
 				// listener.getLogger().println("rootDir=["+rootDir+"]");
 				XmlFile t = new XmlFile(Hudson.XSTREAM, new File(rootDir, "DeployHub.xml"));
 				if (t != null) {
-					JSONObject mydata = new JSONObject();
+					JsonObject mydata = new JsonObject();
 					if (t.exists()) {
 						t.unmarshal(mydata);
 					} 
-					mydata.put("LastBuild",buildno);
-					mydata.put("DeploymentID",deploymentid);
+					mydata.addProperty("LastBuild",buildno);
+					mydata.addProperty("DeploymentID",deploymentid);
 					t.write(mydata);
 				} 
 					
@@ -787,13 +781,13 @@ public class DeployHub extends Recorder {
             return "DeployHub Interface";
         }
 
-        @Override
-        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+        public boolean configure(StaplerRequest req, JsonObject formData) throws FormException {
             // To persist global configuration information,
             // set that to properties and call save().
-            this.serverURL = formData.getString("serverURL");
+            this.serverURL = formData.getAsJsonPrimitive("serverURL").getAsString();
             save();
-            return super.configure(req,formData);
+            
+            return super.configure(req);
         }
 
         public String getServerURL() {
