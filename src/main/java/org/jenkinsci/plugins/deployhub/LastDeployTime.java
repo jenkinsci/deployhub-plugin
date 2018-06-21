@@ -10,13 +10,16 @@ import java.nio.file.Paths;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import hudson.Extension;
 import hudson.model.AbstractItem;
@@ -74,6 +77,9 @@ public class LastDeployTime extends ListViewColumn {
     
  private String formatDescription(AbstractItem job, boolean trimIt)
  {
+  String deploymentid = "N/A";
+  Document doc = null;
+  
   if (job == null)
   {
    return null;
@@ -83,27 +89,59 @@ public class LastDeployTime extends ListViewColumn {
   File t = new File(rootDir, "DeployHub.xml");
   if (t != null && t.exists())
   {
-   try
-   {
     // Parse XML to DOM
-    String xml = readFile(t.getPath(), StandardCharsets.UTF_8);
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder builder = factory.newDocumentBuilder();
-    Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
+    String xml = "";
+    try
+    {
+     xml = readFile(t.getPath(), StandardCharsets.UTF_8);
+    }
+    catch (IOException e)
+    {
+     e.printStackTrace();
+    }
+
+    try
+    {
+     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+     DocumentBuilder builder = null;
+     builder = factory.newDocumentBuilder();
+
+     doc = builder.parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
+    }
+    catch (SAXException | IOException | ParserConfigurationException e)
+    {
+     e.printStackTrace();
+    }
     XPathFactory xPathfactory = XPathFactory.newInstance();
     XPath xpath = xPathfactory.newXPath();
-    XPathExpression expr = xpath.compile("/net.sf.json.JSONObject/properties/org.apache.commons.collections.map.ListOrderedMap/map/entry[*]/int");
-    String deploymentid = (String) expr.evaluate(doc, XPathConstants.STRING);
 
-    if (deploymentid != null)
-     return deploymentid;
-   }
-   catch (Exception ex)
-   {
-   }
+    XPathExpression expr;
+    try
+    {
+     expr = xpath.compile("/net.sf.json.JSONObject/properties/org.apache.commons.collections.map.ListOrderedMap/map/entry[*]/int");
+     deploymentid = (String) expr.evaluate(doc, XPathConstants.STRING);
+     if (deploymentid != null)
+      return deploymentid;
+    }
+    catch (XPathExpressionException e)
+    {
+     e.printStackTrace();
+    }
 
+    try
+    {
+     expr = xpath.compile("/properties/DeploymentID");
+     deploymentid = (String) expr.evaluate(doc, XPathConstants.STRING);
+     
+     if (deploymentid != null)
+      return deploymentid;
+    } 
+    catch (XPathExpressionException e)
+    {
+     e.printStackTrace();
+    } 
   }
-  return "N/A";
+  return deploymentid;
  }
     
     static String readFile(String path, Charset encoding) 

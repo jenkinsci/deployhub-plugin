@@ -1,9 +1,13 @@
 package org.jenkinsci.plugins.deployhub;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -11,12 +15,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
-// import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -29,12 +35,10 @@ import com.google.gson.JsonParser;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.XmlFile;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
-import hudson.model.Hudson;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
@@ -662,15 +666,19 @@ public class DeployHub extends Recorder {
 				//
 				String rootDir = build.getProject().getRootDir().getAbsolutePath();
 				// listener.getLogger().println("rootDir=["+rootDir+"]");
-				XmlFile t = new XmlFile(Hudson.XSTREAM, new File(rootDir, "DeployHub.xml"));
-				if (t != null) {
-					JsonObject mydata = new JsonObject();
-					if (t.exists()) {
-						t.unmarshal(mydata);
-					} 
-					mydata.addProperty("LastBuild",buildno);
-					mydata.addProperty("DeploymentID",deploymentid);
-					t.write(mydata);
+				
+				File t = new File(rootDir, "DeployHub.xml");
+				String xml = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+				  "<properties>\n" +
+				  "  <LastBuild>" + buildno + "</LastBuild>\n" + 
+      "  <DeploymentID>" + deploymentid + "</DeploymentID>\n" + 
+      "</properties>\n";
+				
+ 			if (t.canWrite()) {
+ 			 BufferedWriter fw = new BufferedWriter
+ 		    (new OutputStreamWriter(new FileOutputStream(t), StandardCharsets.UTF_8));
+     fw.write(xml);
+     fw.close();
 				} 
 					
 			} else {
@@ -693,6 +701,13 @@ public class DeployHub extends Recorder {
 		return false;
 	}
 
+ static String readFile(String path, Charset encoding) 
+   throws IOException 
+ {
+   byte[] encoded = Files.readAllBytes(Paths.get(path));
+   return new String(encoded, encoding);
+ }
+ 
 	// Overridden for better type safety.
 	@Override
 	public DescriptorImpl getDescriptor() {
