@@ -1,18 +1,29 @@
 package org.jenkinsci.plugins.deployhub;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.w3c.dom.Document;
 
 import hudson.Extension;
 import hudson.model.AbstractItem;
-import hudson.XmlFile;
-import hudson.model.Hudson;
-import hudson.views.ListViewColumnDescriptor;
 import hudson.views.ListViewColumn;
-import net.sf.json.JSONObject;
-import java.io.*;
+import hudson.views.ListViewColumnDescriptor;
 
 public class LastDeployTime extends ListViewColumn {
-
     private boolean displayName;
     private boolean trim;
     private int displayLength; //numbers of lines to display
@@ -61,23 +72,45 @@ public class LastDeployTime extends ListViewColumn {
         return formatDescription(job, isTrim());
     }
     
-    private String formatDescription(AbstractItem job, boolean trimIt) {
-        if (job == null) {
-            return null;
-        }
-	
-	String rootDir=job.getRootDir().getAbsolutePath();
-	XmlFile t = new XmlFile(Hudson.XSTREAM, new File(rootDir, "DeployHub.xml"));
-	if (t != null && t.exists()) {
-		try {
-			JSONObject keyvals = (JSONObject)t.read();
-			if (keyvals.containsKey("DeploymentID")) {
-				return (String)keyvals.get("DeploymentID").toString();
-			}
-		} catch(IOException ex) {
-		}
-	} 
-	return "N/A";
+ private String formatDescription(AbstractItem job, boolean trimIt)
+ {
+  if (job == null)
+  {
+   return null;
+  }
+
+  String rootDir = job.getRootDir().getAbsolutePath();
+  File t = new File(rootDir, "DeployHub.xml");
+  if (t != null && t.exists())
+  {
+   try
+   {
+    // Parse XML to DOM
+    String xml = readFile(t.getPath(), StandardCharsets.UTF_8);
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder builder = factory.newDocumentBuilder();
+    Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes("utf-8")));
+    XPathFactory xPathfactory = XPathFactory.newInstance();
+    XPath xpath = xPathfactory.newXPath();
+    XPathExpression expr = xpath.compile("/net.sf.json.JSONObject/properties/org.apache.commons.collections.map.ListOrderedMap/map/entry[*]/int");
+    String deploymentid = (String) expr.evaluate(doc, XPathConstants.STRING);
+
+    if (deploymentid != null)
+     return deploymentid;
+   }
+   catch (Exception ex)
+   {
+   }
+
+  }
+  return "N/A";
+ }
+    
+    static String readFile(String path, Charset encoding) 
+      throws IOException 
+    {
+      byte[] encoded = Files.readAllBytes(Paths.get(path));
+      return new String(encoded, encoding);
     }
 
     @Extension

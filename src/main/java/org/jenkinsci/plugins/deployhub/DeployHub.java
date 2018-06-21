@@ -40,7 +40,6 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
-import net.sf.json.JSONException;
 
 public class DeployHub extends Recorder {
 
@@ -593,7 +592,7 @@ public class DeployHub extends Recorder {
 								listener.getLogger().println(res2.getAsJsonPrimitive("error").getAsString());
 								return false;
 							}
-						} catch(JSONException ex) {
+						} catch(Exception ex) {
 							// Exception will be thrown if "name" or "value" aren't set to anything
 						}
 					}
