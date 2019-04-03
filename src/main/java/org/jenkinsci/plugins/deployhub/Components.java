@@ -1,10 +1,11 @@
 package org.jenkinsci.plugins.deployhub;
 
-import hudson.Extension;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
+import hudson.Extension;
 import hudson.model.Action;
 
 @Extension

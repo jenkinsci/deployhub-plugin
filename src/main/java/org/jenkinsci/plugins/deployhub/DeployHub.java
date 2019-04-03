@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -44,6 +43,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
+import hudson.util.Secret;
 
 public class DeployHub extends Recorder {
 
@@ -72,7 +72,7 @@ public class DeployHub extends Recorder {
 	private boolean debug=false;
 
 	private final String username;
-	private final String password;
+	private final Secret password;
 	private boolean deployApplication;
 	private boolean useAdvanced;
 	private boolean findLatestVersion;
@@ -119,7 +119,7 @@ public class DeployHub extends Recorder {
 			List<Attribute> compatts)
 	{
 		this.username = username;
-		this.password = password;
+		this.password = Secret.fromString(password);
 		this.deployApplication = deployApplication;
 		this.useAdvanced = useAdvanced;
 		this.findLatestVersion = findLatestVersion;
@@ -149,7 +149,7 @@ public class DeployHub extends Recorder {
 	}
 
 	public String getPassword() {
-		return password;
+		return Secret.toString(password);
 	}
 
 	public boolean getDeployApplication() {
@@ -327,7 +327,7 @@ public class DeployHub extends Recorder {
 			//
 			String urlstr = server + "/dmadminweb/API/login"
 			+"?user="+URLEncoder.encode(username, "UTF-8")
-			+"&pass="+URLEncoder.encode(password, "UTF-8");
+			+"&pass="+URLEncoder.encode(Secret.toString(password), "UTF-8");
 			//listener.getLogger().println("DEBUG: urlstr="+urlstr);
 			JsonObject res = SendMessage(listener,cm,urlstr);
 			//listener.getLogger().println("JSON Result = "+res.toString());

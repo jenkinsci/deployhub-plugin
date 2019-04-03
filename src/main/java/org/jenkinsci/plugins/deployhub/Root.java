@@ -1,12 +1,14 @@
 package org.jenkinsci.plugins.deployhub;
 
-import hudson.Extension;
-import hudson.model.RootAction;
-import hudson.model.Action;
-import jenkins.model.ModelObjectWithContextMenu;
+import java.util.List;
+
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import java.util.List;
+
+import hudson.Extension;
+import hudson.model.Action;
+import hudson.model.RootAction;
+import jenkins.model.ModelObjectWithContextMenu;
 
 /**
  * Entry point to all the UI samples.
