@@ -152,7 +152,17 @@ class deployhub {
         new groovy.json.JsonSlurperClassic().parseText(json)
     }
     
-   
+   /**
+    * Move an application version to another stage of the pipeline
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param Application the application to move
+    * @param FromDomain the domain to move from
+    * @param Task the move task
+    * @return Array with first element being the return code, second the msg
+    **/
+
     def moveApplication(String url, String userid, String pw, String Application, String FromDomain, String Task)
     {
      // Get appid
@@ -192,6 +202,14 @@ class deployhub {
      }
     }
     
+  /**
+    * Force a deployment to an environment
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param Environment the application to move
+    **/
+
     def forceDeployIfNeeded(String url, String userid, String pw, String Environment)
     {
      def data = ServersInEnvironment(url,userid,pw,Environment);
@@ -212,6 +230,15 @@ class deployhub {
      }
     }
     
+  /**
+    * List servers in an environment
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param Environment the application to move
+    * @return Array with first element being the return code, second Array of servers
+    **/
+
     def ServersInEnvironment(String url, String userid, String pw, String Environment)
     {
      def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/environment/" + enc(Environment));
@@ -221,6 +248,15 @@ class deployhub {
       return [true,data];
     }
     
+  /**
+    * Ping the server to see if its running
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param server the server to test
+    * @return Array with first element being the return code, second details about the server
+    **/
+
     def ServerRunning(String url, String userid, String pw, String server)
     {
      def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/testserver/" + enc(server));
@@ -230,6 +266,16 @@ class deployhub {
       return [true,data];
     }
     
+  /**
+    * Deploy an application to an environment
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param Application Text the Application to deploy
+    * @param Environment Text the target Environment
+    * @return Array with first element being the return code, second the deployment id
+    **/
+
     def deployApplication(String url, String userid, String pw, String Application, String Environment)
     {
      def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/deploy/" + enc(Application) + "/" + enc(Environment) + "?wait=N");
@@ -238,6 +284,15 @@ class deployhub {
      else
       return [true,data];
     }
+
+  /**
+    * Get the deployment logs
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param deployid Text the deployment id to check
+    * @return Array with first element being the return code, second the log data
+    **/
 
     def getLogs(String url, String userid, String pw, String deployid)
     {
@@ -279,6 +334,15 @@ class deployhub {
      return [true,output];
     }
 
+  /**
+    * Check to see if a deployment is done
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param deployid Text the deployment id to check
+    * @return Array with first element being the return code, second true/false
+    **/
+
     def isDeploymentDone(String url, String userid, String pw, String deployid)
     {
      def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/log/" + deployid + "?checkcomplete=Y");
@@ -291,7 +355,16 @@ class deployhub {
 
      return [true,data];
     }
-        
+
+  /**
+    * Approve the application version for its current pipeline stage
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param Application Text the Application to approve
+    * @return Array with first element being the return code, second approval results
+    **/
+
     def approveApplication(String url, String userid, String pw, String Application)
     {
      // Get appid
@@ -305,6 +378,53 @@ class deployhub {
       return [false, "Could not Approve Application '" + Application + "'"];
      else
       return [true,data];
+    }   
+
+  /**
+    * Update the component attrs 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param Component Text the Component to update
+    * @param Attrs Map the key values pairs of attrs
+    * @return Array with first element being the return code, second msg
+    **/
+
+    def updateComponentAttrs(String url, String userid, String pw, String Component, Map Attrs)
+    {
+     // Get compId
+     def data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/component/" + enc(Component));
+
+     def compid = data.result.id;
+     
+     def count = 0;
+     def i = 0;
+     def attr_str = "";
+
+     for ( e in Attrs ) 
+     {
+      def key   = ${e.key};
+      def value = ${e.value};
+
+      if (count == 0)
+       attr_str = attr_str + "name=" + enc(key) + "&value=" + enc(value)
+      else
+       attr_str = attr_str + "name" + count + "=" + enc(key) + "&value" + count + "=" + enc(value)
+
+      count = count + 1
+     }
+
+     if (attr_str.length() > 0)
+     {
+      // Update Attrs for component
+      data = doGetHttpRequestWithJson(userid,pw,"${url}/dmadminweb/API/setvar/component/" + compid + "?" + attr_str);
+      if (data.size() == 0)
+       return [false, "Could not update attributes on '" + Component + "'"];
+      else
+       return [true,data];
+     } 
+     else
+      return [false, "No attributes to update on '" + Component + "'"];  
     }   
 }
 
