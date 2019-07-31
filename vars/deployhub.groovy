@@ -503,11 +503,11 @@ class deployhub
 
     def short_compname = "";
 
-    if (compname.contains('.'))
+    if (compname.indexOf('.') >= 0)
     {
-      String[] parts = compname.split('.');
-      short_compname = parts[parts.size() - 1];
+     compname = compname.tokenize('.').last();
     }
+
     // Create new version of component variant base on latest comp variant# Get the new compid
     // for the new version of the component variant
     if (found_compname == "" || found_compname != (short_compname + ";" + compvariant + ";" + compversion) || (compversion == "" && found_compname != (short_compname + ";" + compvariant)))
