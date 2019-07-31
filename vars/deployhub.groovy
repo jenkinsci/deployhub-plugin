@@ -411,12 +411,10 @@ class deployhub
   def updateName(String url, String userid, String pw, String compname, String compvariant, String compversion, Integer compid)
     {
       def data;
-      echo "COMPNAME=" + compname;
 
-      if (compname.contains('.'))
+      if (compname.indexOf('.') >= 0)
       {
-       String[] parts = compname.split('.');
-       compname = parts.last();
+       compname = compname.tokenize('.').last();
       }
 
       if (compversion == null)
