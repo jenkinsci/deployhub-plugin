@@ -411,7 +411,7 @@ class deployhub
   def updateName(String url, String userid, String pw, String compname, String compvariant, String compversion, Integer compid)
     {
       def data;
-      echo "COMPNAME=" + compname
+      echo "COMPNAME=" + compname;
 
       if (compname.contains('.'))
       {
