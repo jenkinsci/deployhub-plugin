@@ -415,7 +415,7 @@ class deployhub
       if (compname.contains('.'))
       {
        String[] parts = compname.split('.');
-       compname = parts[parts.size()-1];
+       compname = parts.last();
       }
 
       if (compversion == null)
