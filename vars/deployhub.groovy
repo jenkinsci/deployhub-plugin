@@ -500,7 +500,7 @@ class deployhub
     // if one is not found
     // Get the new compid of the new component variant
     if (compid < 0)
-      compid = newComponent(url, userid, pw, compname, compvariant, "", -1);
+      compid = newComponent(url, userid, pw, compname, compvariant, "", "", -1);
 
     def short_compname = "";
 
@@ -511,7 +511,7 @@ class deployhub
     }
     // Create new version of component variant base on latest comp variant# Get the new compid
     // for the new version of the component variant
-    if (found_compname == "" || found_compname != (short_compname + ";" + compvariant + ";" + compversion))
+    if (found_compname == "" || found_compname != (short_compname + ";" + compvariant + ";" + compversion) || (compversion == "" && found_compname != (short_compname + ";" + compvariant)))
       compid = newComponent(url, userid, pw, compname, compvariant, compversion, 'docker', compid);
     return compid;
   }
