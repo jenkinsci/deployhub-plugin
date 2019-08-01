@@ -697,7 +697,7 @@ class deployhub
       if (count == 0)
         attr_str = attr_str + "name=" + enc(key) + "&value=" + enc(value);
       else
-        attr_str = attr_str + "name" + count + "=" + enc(key) + "&value" + count + "=" + enc(value);
+        attr_str = attr_str + "&name" + count + "=" + enc(key) + "&value" + count + "=" + enc(value);
 
       count = count + 1;
     }
