@@ -622,7 +622,7 @@ class deployhub
     def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/component/" + enc(Component));
 
     if (data == null)
-      return [-1, "",Component];
+      return [-1, ""];
 
     if (data.success)
     {
@@ -642,11 +642,11 @@ class deployhub
           }
         }
       }
-      return [compid, name, Component];
+      return [compid, name];
     }
     else
     {
-      return [-1, "", Component];
+      return [-1, ""];
     }
   }
 
