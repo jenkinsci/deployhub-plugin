@@ -531,7 +531,7 @@ class deployhub
     // Get latest version of compnent variant
     def data = getComponent(url, userid, pw, compname, compvariant, compversion);
     return data.toString();
-    
+
     def compid = data[0];
     def found_compname = data[1];
     def check_compname = "";
@@ -600,6 +600,21 @@ class deployhub
       else
         Component = compname;
 
+    def check_compname = "";
+    def short_compname = "";
+
+    if (compname.indexOf('.') >= 0)
+    {
+     short_compname = compname.tokenize('.').last();
+    }
+
+    if (compvariant != null && compvariant != "" && compversion != null && compversion != "")
+        check_compname = short_compname + ";" + compvariant + ";" + compversion;
+    else if (compvariant != null && compvariant != "")
+        check_compname = short_compname + ";" + compvariant;
+      else
+        check_compname = short_compname;
+
     def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/component/" + enc(Component));
 
     if (data == null)
@@ -610,14 +625,12 @@ class deployhub
       def compid = data.result.id;
       def name = data.result.name;
 
-      return "GET " + name + "=" + Component;
-
-      if (name != Component)
+      if (name != check_compname)
       {
         def vers = data.result.versions;
         for (v in vers)
         {
-          if (v.name == Component)
+          if (v.name == check_compname)
           {
             compid = v.id;
             break;
