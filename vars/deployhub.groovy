@@ -114,6 +114,12 @@ class deployhub
     return doHttpRequestWithJson(userid, pw, json, requestUrl, "PUT");
   }
 
+  def private String cleanName(String name)
+  {
+   name = name.replaceAll("\\.","_"); 
+   name = name.replaceAll("-","_"); 
+   return name;
+  }
   /**    
    * Post/Put the json content to the given url and ensures a 200 or 201 status on the response.    
    * If a negative status is returned, an error will be raised and the pipeline will fail.    
@@ -412,6 +418,15 @@ class deployhub
     {
       def data;
 
+      compvariant = cleanName(compvariant);
+      compversion = cleanName(compversion);
+
+      if (compvariant == "")
+      {
+       compvariant = compversion;
+       compversion = null;  
+      }
+
       if (compname.indexOf('.') >= 0)
       {
        compname = compname.tokenize('.').last();
@@ -455,6 +470,15 @@ class deployhub
 
   def newComponent(String url, String userid, String pw, String compname, String compvariant, String compversion, String kind, Integer parent_compid)
   {
+    compvariant = cleanName(compvariant);
+    compversion = cleanName(compversion);
+
+    if (compvariant == "")
+    {
+      compvariant = compversion;
+      compversion = null;  
+    }
+
     def compid = 0;
     def data;
     // Create base version
@@ -490,6 +514,15 @@ class deployhub
 
   def newComponentVersion(String url, String userid, String pw, String compname, String compvariant, String compversion)
   {
+    compvariant = cleanName(compvariant);
+    compversion = cleanName(compversion);
+
+    if (compvariant == "")
+    {
+      compvariant = compversion;
+      compversion = null;  
+    }
+
     // Get latest version of compnent variant
     def data = getComponent(url, userid, pw, compname, compvariant, compversion);
     def compid = data[0];
@@ -499,7 +532,12 @@ class deployhub
     // if one is not found
     // Get the new compid of the new component variant
     if (compid < 0)
-      compid = newComponent(url, userid, pw, compname, compvariant, "", "", -1);
+    {
+      if (compversion == null) 
+        compid = newComponent(url, userid, pw, compname, "", "", "", -1);
+      else
+        compid = newComponent(url, userid, pw, compname, compvariant, "", "", -1);
+    }
 
     def short_compname = "";
 
@@ -528,10 +566,19 @@ class deployhub
 
   def getComponent(String url, String userid, String pw, String compname, String compvariant, String compversion)
   {
+    compvariant = cleanName(compvariant);
+    compversion = cleanName(compversion);
+
+    if (compvariant == "")
+    {
+      compvariant = compversion;
+      compversion = null;  
+    }
+
     // Get compId
     def Component = compname + ";" + compvariant;
 
-    if (compversion != "")
+    if (compversion != null && compversion != "")
       Component = Component + ";" + compversion;
 
     def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/component/" + enc(Component));
@@ -579,6 +626,15 @@ class deployhub
 
   def updateComponentAttrs(String url, String userid, String pw, String compname, String compvariant, String compversion, Map Attrs)
   {
+    compvariant = cleanName(compvariant);
+    compversion = cleanName(compversion);
+
+    if (compvariant == "")
+    {
+      compvariant = compversion;
+      compversion = null;  
+    }
+
     // Get compId    
     def data = getComponent(url, userid, pw, compname, compvariant, compversion);
     def compid = data[0];
