@@ -536,7 +536,6 @@ class deployhub
      if (data[0] == -1)
        data = getComponent(url, userid, pw, compname, "", null);
     }
-    return data;
 
     def compid = data[0];
     def found_compname = data[1];
