@@ -614,10 +614,9 @@ class deployhub
       else
         check_compname = short_compname;
 
-    return Component + "=" + check_compname;
-    
     def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/component/" + enc(Component));
-
+    return data;
+    
     if (data == null)
       return [-1, ""];
 
