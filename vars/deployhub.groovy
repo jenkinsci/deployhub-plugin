@@ -530,9 +530,12 @@ class deployhub
 
     // Get latest version of compnent variant
     def data = getComponent(url, userid, pw, compname, compvariant, compversion);
-    
     if (data[0] == -1)
-      data = getComponent(url, userid, pw, compname, compvariant, null);
+    {
+     data = getComponent(url, userid, pw, compname, compvariant, null);
+     if (data[0] == -1)
+       data = getComponent(url, userid, pw, compname, "", null);
+    }
 
     def compid = data[0];
     def found_compname = data[1];
