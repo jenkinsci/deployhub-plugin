@@ -625,8 +625,6 @@ class deployhub
       def compid = data.result.id;
       def name = data.result.name;
 
-      return data.result.versions;
-
       if (name != check_compname)
       {
         def vers = data.result.versions;
@@ -635,6 +633,7 @@ class deployhub
           if (v.name == check_compname)
           {
             compid = v.id;
+            name = v.name;
             break;
           }
         }
