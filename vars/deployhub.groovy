@@ -625,8 +625,8 @@ class deployhub
       def compid = data.result.id;
       def name = data.result.name;
 
-      return "GET " + name + "=" + check_compname;
-      
+      return data.result.versions;
+
       if (name != check_compname)
       {
         def vers = data.result.versions;
