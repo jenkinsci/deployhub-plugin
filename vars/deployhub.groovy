@@ -458,7 +458,7 @@ class deployhub
   def newComponentItem(String url, String userid, String pw, Integer compid, String kind)
   {
     // Get compId    
-    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=inv&c=" + compid + "&xpos=100&ypos=100&kind=" + kind&removeall=Y);
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=inv&c=" + compid + "&xpos=100&ypos=100&kind=" + kind + "&removeall=Y");
     return data;
   }
 
