@@ -618,8 +618,7 @@ return data;
         check_compname = short_compname;
 
     def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/component/" + enc(Component));
-    return data;
-    
+
     if (data == null)
       return [-1, ""];
 
