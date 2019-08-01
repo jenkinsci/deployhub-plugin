@@ -534,12 +534,19 @@ class deployhub
     def found_compname = data[1];
     def check_compname = "";
 
+    def short_compname = "";
+
+    if (compname.indexOf('.') >= 0)
+    {
+     short_compname = compname.tokenize('.').last();
+    }
+
     if (compvariant != null && compvariant != "" && compversion != null && compversion != "")
-        check_compname = compname + ";" + compvariant + ";" + compversion;
+        check_compname = short_compname + ";" + compvariant + ";" + compversion;
     else if (compvariant != null && compvariant != "")
-        check_compname = compname + ";" + compvariant;
+        check_compname = short_compname + ";" + compvariant;
       else
-        check_compname = compname;
+        check_compname = short_compname;
 
     // Create base component variant
     // if one is not found
@@ -551,14 +558,7 @@ class deployhub
       else
         compid = newComponent(url, userid, pw, compname, compvariant, "", "", -1);
     }
-
-    def short_compname = "";
-
-    if (compname.indexOf('.') >= 0)
-    {
-     compname = compname.tokenize('.').last();
-    }
-
+    
     return found_compname + "=" + check_compname;
     // Create new version of component variant base on latest comp variant# Get the new compid
     // for the new version of the component variant
