@@ -534,6 +534,7 @@ class deployhub
     if (data == null)
       data = getComponent(url, userid, pw, compname, compvariant, null);
 
+return data;
     def compid = data[0];
     def found_compname = data[1];
     def check_compname = "";
@@ -557,8 +558,6 @@ class deployhub
     // Get the new compid of the new component variant
     if (compid < 0)
     {
-      return compvariant + ";" + compversion;
-
       if (compversion == null) 
         compid = newComponent(url, userid, pw, compname, "", "", "", -1);
       else
