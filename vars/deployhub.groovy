@@ -532,6 +532,14 @@ class deployhub
     def data = getComponent(url, userid, pw, compname, compvariant, compversion);
     def compid = data[0];
     def found_compname = data[1];
+    def check_compname = "";
+
+    if (compvariant != null && compvariant != "" && compversion != null && compversion != "")
+        check_compname = compname + ";" + compvariant + ";" + compversion;
+    else if (compvariant != null && compvariant != "")
+        check_compname = compname + ";" + compvariant;
+      else
+        check_compname = compname;
 
     // Create base component variant
     // if one is not found
@@ -553,7 +561,7 @@ class deployhub
 
     // Create new version of component variant base on latest comp variant# Get the new compid
     // for the new version of the component variant
-    if (found_compname == "" || found_compname != (short_compname + ";" + compvariant + ";" + compversion) || (compversion == "" && found_compname != (short_compname + ";" + compvariant)))
+    if (found_compname == "" || found_compname != check_compname)
       compid = newComponent(url, userid, pw, compname, compvariant, compversion, 'docker', compid);
     return compid;
   }
