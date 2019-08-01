@@ -697,7 +697,7 @@ class deployhub
       if (count == 0)
         attr_str = attr_str + "name=" + enc(key) + "&value=" + enc(value);
       else
-        attr_str = attr_str + "name" + count + "=" + enc(key) + "&value" + count + "=" + enc(value);
+        attr_str = attr_str + "&name" + count + "=" + enc(key) + "&value" + count + "=" + enc(value);
 
       count = count + 1;
     }
@@ -709,7 +709,7 @@ class deployhub
       if (data.size() == 0)
         return [false, "Could not update attributes on '" + Component + "'"];
       else
-        return [true, data];
+        return [true, data, "${url}/dmadminweb/API/setvar/component/" + compid + "?" + attr_str];
     }
     else
       return [false, "No attributes to update on '" + Component + "'"];
