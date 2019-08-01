@@ -557,6 +557,8 @@ class deployhub
     // Get the new compid of the new component variant
     if (compid < 0)
     {
+      return compvariant + ";" + compversion;
+
       if (compversion == null) 
         compid = newComponent(url, userid, pw, compname, "", "", "", -1);
       else
