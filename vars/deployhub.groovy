@@ -116,6 +116,9 @@ class deployhub
 
   def private String cleanName(String name)
   {
+   if (name == null)
+     return name;
+     
    name = name.replaceAll("\\.","_"); 
    name = name.replaceAll("-","_"); 
    return name;
