@@ -118,7 +118,7 @@ class deployhub
   {
    if (name == null)
      return name;
-     
+
    name = name.replaceAll("\\.","_"); 
    name = name.replaceAll("-","_"); 
    return name;
@@ -424,7 +424,7 @@ class deployhub
       compvariant = cleanName(compvariant);
       compversion = cleanName(compversion);
 
-      if (compvariant == "")
+      if (compvariant == "" && compversion != null && compversion != "")
       {
        compvariant = compversion;
        compversion = null;  
@@ -476,7 +476,7 @@ class deployhub
     compvariant = cleanName(compvariant);
     compversion = cleanName(compversion);
 
-    if (compvariant == "")
+    if (compvariant == "" && compversion != null && compversion != "")
     {
       compvariant = compversion;
       compversion = null;  
@@ -520,7 +520,7 @@ class deployhub
     compvariant = cleanName(compvariant);
     compversion = cleanName(compversion);
 
-    if (compvariant == "")
+    if (compvariant == "" && compversion != null && compversion != "")
     {
       compvariant = compversion;
       compversion = null;  
@@ -572,7 +572,7 @@ class deployhub
     compvariant = cleanName(compvariant);
     compversion = cleanName(compversion);
 
-    if (compvariant == "")
+    if (compvariant == "" && compversion != null && compversion != "")
     {
       compvariant = compversion;
       compversion = null;  
@@ -632,7 +632,7 @@ class deployhub
     compvariant = cleanName(compvariant);
     compversion = cleanName(compversion);
 
-    if (compvariant == "")
+    if (compvariant == "" && compversion != null && compversion != "")
     {
       compvariant = compversion;
       compversion = null;  
