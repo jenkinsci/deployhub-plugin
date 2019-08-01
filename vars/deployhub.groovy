@@ -589,11 +589,14 @@ class deployhub
       compversion = null;  
     }
 
-    // Get compId
-    def Component = compname + ";" + compvariant;
+    def Component = "";
 
-    if (compversion != null && compversion != "")
-      Component = Component + ";" + compversion;
+    if (compvariant != null && compvariant != "" && compversion != null && compversion != "")
+        Component = compname + ";" + compvariant + ";" + compversion;
+    else if (compvariant != null && compvariant != "")
+        Component = compname + ";" + compvariant;
+      else
+        Component = compname;
 
     def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/component/" + enc(Component));
 
