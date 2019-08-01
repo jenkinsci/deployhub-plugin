@@ -709,7 +709,7 @@ class deployhub
       if (data.size() == 0)
         return [false, "Could not update attributes on '" + Component + "'"];
       else
-        return [true, data];
+        return [true, data, "${url}/dmadminweb/API/setvar/component/" + compid + "?" + attr_str];
     }
     else
       return [false, "No attributes to update on '" + Component + "'"];
