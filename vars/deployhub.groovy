@@ -560,7 +560,6 @@ class deployhub
         compid = newComponent(url, userid, pw, compname, compvariant, "", "", -1);
     }
     
-    return found_compname + "=" + check_compname;
     // Create new version of component variant base on latest comp variant# Get the new compid
     // for the new version of the component variant
     if (found_compname == "" || found_compname != check_compname)
