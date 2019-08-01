@@ -435,10 +435,12 @@ class deployhub
        compname = compname.tokenize('.').last();
       }
 
-      if (compversion == null)
+      if (compvariant != null && compvariant != "" && compversion != null && compversion != "")
+        data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateSummaryData?objtype=23&id=" + compid + "&change_1=" + enc(compname + ";" + compvariant + ";" + compversion));
+      else if (compvariant != null && compvariant != "")
         data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateSummaryData?objtype=23&id=" + compid + "&change_1=" + enc(compname + ";" + compvariant));
       else
-        data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateSummaryData?objtype=23&id=" + compid + "&change_1=" + enc(compname + ";" + compvariant + ";" + compversion));
+        data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateSummaryData?objtype=23&id=" + compid + "&change_1=" + enc(compname));
 
       return data;
     }
