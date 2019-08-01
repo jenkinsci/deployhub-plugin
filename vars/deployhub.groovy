@@ -616,7 +616,7 @@ return data;
         check_compname = short_compname + ";" + compvariant;
       else
         check_compname = short_compname;
-return Component;
+return enc(Component);
 
     def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/component/" + enc(Component));
 
