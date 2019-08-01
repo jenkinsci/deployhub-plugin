@@ -705,8 +705,8 @@ class deployhub
     if (attr_str.length() > 0)
     {
       // Update Attrs for component
-      return ${url}/dmadminweb/API/setvar/component/" + compid + "?" + attr_str;
-      
+      return "${url}/dmadminweb/API/setvar/component/" + compid + "?" + attr_str;
+
       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/setvar/component/" + compid + "?" + attr_str);
       if (data.size() == 0)
         return [false, "Could not update attributes on '" + Component + "'"];
