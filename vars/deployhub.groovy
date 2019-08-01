@@ -668,6 +668,8 @@ class deployhub
       compversion = null;  
     }
 
+    return  compname + ";" + compvariant + ";" + compversion;
+
     // Get compId    
     def data = getComponent(url, userid, pw, compname, compvariant, compversion);
     def compid = data[0];
