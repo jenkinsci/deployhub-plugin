@@ -697,6 +697,9 @@ class deployhub
     Attrs.eachWithIndex
     {
       key,value,index ->
+      if (value == null)
+        value = ""
+
       if (count == 0)
         attr_str = attr_str + "name=" + enc(key) + "&value=" + enc(value);
       else
