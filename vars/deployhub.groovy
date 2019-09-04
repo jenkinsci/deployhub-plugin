@@ -650,6 +650,101 @@ class deployhub
     }
   }
 
+  /**
+    * Get the Application Id 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param compname Text the component name
+    * @param compvariant Text the variant for the component
+    * @param compversion Text the version of the variant
+    * @return component id, "" for not found
+    **/
+
+  def getApplication(String url, String userid, String pw, String appname, String appversion)
+  {
+    appversion = cleanName(appversion);
+
+    def Application = "";
+
+    if (appversion != null && appversion != "")
+      Application = appname + ";" + appversion;
+    else
+      Application = appname;
+
+    def check_appname = "";
+    def short_appname = "";
+
+    if (appname.indexOf('.') >= 0)
+    {
+     short_appname = appname.tokenize('.').last();
+    }
+
+    if (appversion != null && appversion != "")
+        check_appname = short_appname + ";" + compversion;
+      else
+        check_appname = short_appname;
+
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/application/" + enc(application));
+
+    if (data == null)
+      return [-1, ""];
+
+    if (data.success)
+    {
+      def appid = data.result.id;
+      def name = data.result.name;
+
+      return [appid, name];
+    }
+    else
+    {
+      return [-1, ""];
+    }
+  }
+
+  /**
+    * New Application Version  
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param appname Text the application name
+    * @param appversion Text the version of the application
+    * @return Boolean success/failure
+    **/
+
+  def newApplication(String url, String userid, String pw, String appname, String appversion)
+  {
+    appversion = cleanName(appversion);
+
+    def appid = 0;
+    def data;
+    def parent_appid = -1;
+
+    domain = ""
+    if (appname.indexOf('.') >= 0)
+    {
+     def parts = appname.tokenize('.');
+     parts.removeLast();
+     domain = parts.join('.');
+     domain="&domain=" + enc(domain);
+    }
+
+    // Get Base Version
+    parent_appid = getApplication(url,userid,pw,appname);
+
+    // Create base version
+    if (parent_appid < 0)
+    {
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/application/" + enc(appname)) + domain;
+      parent_appid = data.result.id;
+    }
+       
+    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + parent_appid + "/?name=" + enc(appname + ";" + appversion)) + domain;
+    appid = data.result.id;
+    
+    return appid;
+  }
 
   /**
     * Update the component attrs 
