@@ -732,7 +732,7 @@ class deployhub
     }
 
     // Get Base Version
-    parent_appid = getApplication(url,userid,pw,appname);
+    parent_appid = getApplication(url,userid,pw,appname,"");
 
     // Create base version
     if (parent_appid < 0)
