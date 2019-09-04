@@ -727,8 +727,9 @@ class deployhub
     }
 
     // Get Base Version
-    def foundname = "";
-    [parent_appid, foundname] = getApplication(url,userid,pw,appname,"");
+    def data = "";
+    data = getApplication(url,userid,pw,appname,"");
+    parent_appid = data[0];
 
     // Create base version
     if (parent_appid < 0)
