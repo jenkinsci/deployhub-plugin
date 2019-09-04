@@ -735,8 +735,11 @@ class deployhub
     if (parent_appid < 0)
     {
       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/application/" + enc(appname) + "?" + domain);
-      return [data, "${url}/dmadminweb/API/new/application/" + enc(appname) + "?" + domain];
-      // parent_appid = data.result.id;
+      if (data.success)
+      {
+       data = getApplication(url,userid,pw,appname,"");
+       parent_appid = data[0];
+      } 
     }
        
     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + parent_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
