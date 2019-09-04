@@ -705,10 +705,11 @@ class deployhub
     * @param pw Text the DeployHub password
     * @param appname Text the application name
     * @param appversion Text the version of the application
+    * @param envs String Array the environments the base version should be assigned to
     * @return Boolean success/failure
     **/
 
-  def newApplication(String url, String userid, String pw, String appname, String appversion)
+  def newApplication(String url, String userid, String pw, String appname, String appversion, String[] envs)
   {
     appversion = cleanName(appversion);
 
@@ -740,6 +741,14 @@ class deployhub
        data = getApplication(url,userid,pw,appname,"");
        parent_appid = data[0];
       } 
+
+      if (envs != null)
+      {
+        for (def i=0;i<envs.size();i++)
+        {
+         data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/application/" + enc(appname) + "/" + enc(envs[i])); 
+        }
+      }
     }
        
     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + parent_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
