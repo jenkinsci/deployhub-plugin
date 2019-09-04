@@ -725,7 +725,8 @@ class deployhub
     if (appname.indexOf('.') >= 0)
     {
      def parts = appname.tokenize('.');
-     parts.removeLast();
+     if (parts.size() > 0)
+        parts.remove( parts.size() - 1 );
      domain = parts.join('.');
      domain="&domain=" + enc(domain);
     }
