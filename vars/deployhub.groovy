@@ -680,7 +680,7 @@ class deployhub
      short_appname = appname.tokenize('.').last();
     }
 
-    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/application/" + enc(application));
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/application/" + enc(Application));
 
     if (data == null)
       return [-1, ""];
