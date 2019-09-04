@@ -727,7 +727,6 @@ class deployhub
     }
 
     // Get Base Version
-    def data = "";
     data = getApplication(url,userid,pw,appname,"");
     parent_appid = data[0];
 
