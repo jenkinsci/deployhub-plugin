@@ -743,11 +743,13 @@ class deployhub
     }
        
     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + parent_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
-    return [data,"${url}/dmadminweb/API/newappver/" + parent_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain];
-    
+
+    if (!data.success)
+     return [-1,data.error]; 
+
     appid = data.result.id;
     
-    return appid;
+    return [appid,""];
   }
 
   /**
