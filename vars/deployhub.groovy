@@ -680,11 +680,6 @@ class deployhub
      short_appname = appname.tokenize('.').last();
     }
 
-    if (appversion != null && appversion != "")
-        check_appname = short_appname + ";" + compversion;
-      else
-        check_appname = short_appname;
-
     def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/application/" + enc(application));
 
     if (data == null)
