@@ -650,7 +650,135 @@ class deployhub
     }
   }
 
+  /**
+    * Get the Application Id 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param compname Text the component name
+    * @param compvariant Text the variant for the component
+    * @param compversion Text the version of the variant
+    * @return component id, "" for not found
+    **/
 
+  def getApplication(String url, String userid, String pw, String appname, String appversion)
+  {
+    appversion = cleanName(appversion);
+
+    def Application = "";
+
+    if (appversion != null && appversion != "")
+      Application = appname + ";" + appversion;
+    else
+      Application = appname;
+
+    def check_appname = "";
+    def short_appname = "";
+
+    if (appname.indexOf('.') >= 0)
+    {
+     short_appname = appname.tokenize('.').last();
+    }
+
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/application/" + enc(Application));
+
+    if (data == null)
+      return [-1, ""];
+
+    if (data.success)
+    {
+      def appid = data.result.id;
+      def name = data.result.name;
+
+      return [appid, name];
+    }
+    else
+    {
+      return [-1, ""];
+    }
+  }
+
+  /**
+    * New Application Version  
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param appname Text the application name
+    * @param appversion Text the version of the application
+    * @param envs String Array the environments the base version should be assigned to
+    * @return Boolean success/failure
+    **/
+
+  def newApplication(String url, String userid, String pw, String appname, String appversion, String[] envs)
+  {
+    appversion = cleanName(appversion);
+
+    def appid = 0;
+    def data;
+    def parent_appid = -1;
+
+    def domain = ""
+    if (appname.indexOf('.') >= 0)
+    {
+     def parts = appname.tokenize('.');
+     if (parts.size() > 0)
+        parts.remove( parts.size() - 1 );
+     domain = parts.join('.');
+     domain="domain=" + enc(domain);
+     appname = appname.tokenize('.').last();
+    }
+
+    // Get Base Version
+    data = getApplication(url,userid,pw,appname,"");
+    parent_appid = data[0];
+
+    // Create base version
+    if (parent_appid < 0)
+    {
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/application/" + enc(appname) + "?" + domain);
+      if (data.success)
+      {
+       data = getApplication(url,userid,pw,appname,"");
+       parent_appid = data[0];
+      } 
+
+      if (envs != null)
+      {
+        for (def i=0;i<envs.size();i++)
+        {
+         data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/application/" + enc(appname) + "/" + enc(envs[i])); 
+        }
+      }
+    }
+       
+    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + parent_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
+
+    if (!data.success)
+     return [-1,data.error]; 
+
+    appid = data.result.id;
+    
+    return [appid,""];
+  }
+
+ /**
+    * Assign Components to Application Version  
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param appname Text the application name
+    * @param appversion Text the version of the application
+    * @param Components String Array the components to assign to the application version
+    * @return Boolean success/failure
+    **/
+
+  def assignComp2App(String url, String userid, String pw, Integer appid, Integer compid, Integer parent_compid, Integer xpos, Integer ypos)
+  {
+    def data;
+    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=acd&a=" + appid + "&c=" + compid);
+    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=acvm&a=" + appid + "&c=" + compid + "&xpos=" + xpos + "&ypos=" + ypos);
+    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=cal&a=" + appid + "&fn=" + parent_compid + "&tn=" + compid);
+  }
   /**
     * Update the component attrs 
     * @param url Text the url to the DeployHub server
