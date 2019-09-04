@@ -721,7 +721,7 @@ class deployhub
     def data;
     def parent_appid = -1;
 
-    domain = ""
+    def domain = ""
     if (appname.indexOf('.') >= 0)
     {
      def parts = appname.tokenize('.');
