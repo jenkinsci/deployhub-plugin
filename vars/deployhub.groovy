@@ -723,7 +723,7 @@ class deployhub
      if (parts.size() > 0)
         parts.remove( parts.size() - 1 );
      domain = parts.join('.');
-     domain="&domain=" + enc(domain);
+     domain="domain=" + enc(domain);
     }
 
     // Get Base Version
@@ -733,11 +733,11 @@ class deployhub
     // Create base version
     if (parent_appid < 0)
     {
-      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/application/" + enc(appname) + domain);
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/application/" + enc(appname) + "?" + domain);
       parent_appid = data.result.id;
     }
        
-    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + parent_appid + "/?name=" + enc(appname + ";" + appversion) + domain);
+    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + parent_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
     appid = data.result.id;
     
     return appid;
