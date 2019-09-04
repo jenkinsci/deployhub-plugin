@@ -774,6 +774,7 @@ class deployhub
 
   def assignComp2App(String url, String userid, String pw, Integer appid, Integer compid, Integer parent_compid, Integer xpos, Integer ypos)
   {
+    def data;
     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/UpdateAttrs?f=acd&a=" + appid + "&c=" + compid);
     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/UpdateAttrs?f=acvm&a=" + appid + "&c=" + compid + "&xpos=" + xpos + "&ypos=" + ypos);
     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/UpdateAttrs?f=cal&a=" + appid + "&fn=" + parent_compid + "&tn=" + compid);
