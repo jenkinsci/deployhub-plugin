@@ -761,6 +761,23 @@ class deployhub
     return [appid,""];
   }
 
+ /**
+    * Assign Components to Application Version  
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid
+    * @param pw Text the DeployHub password
+    * @param appname Text the application name
+    * @param appversion Text the version of the application
+    * @param Components String Array the components to assign to the application version
+    * @return Boolean success/failure
+    **/
+
+  def assignComp2App(String url, String userid, String pw, Integer appid, Integer compid, Integer parent_compid, Integer xpos, Integer ypos)
+  {
+    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/UpdateAttrs?f=acd&a=" + appid + "&c=" + compid);
+    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/UpdateAttrs?f=acvm&a=" + appid + "&c=" + compid + "&xpos=" + xpos + "&ypos=" + ypos);
+    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/UpdateAttrs?f=cal&a=" + appid + "&fn=" + parent_compid + "&tn=" + compid);
+  }
   /**
     * Update the component attrs 
     * @param url Text the url to the DeployHub server
