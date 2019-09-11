@@ -232,10 +232,11 @@ class deployhub
    * @param url Text the url to the DeployHub server
    * @param userid Text the DeployHub userid
    * @param pw Text the DeployHub password
-   * @param Environment the application to move
+   * @param Environment Text the environment to reset the deployment
+   * @param checkRunning boolean if true then only reset non-running server.  if false ignore running state and reset
    **/
 
-  def forceDeployIfNeeded(String url, String userid, String pw, String Environment)
+  def forceDeployIfNeeded(String url, String userid, String pw, String Environment, boolean checkRunning)
   {
     def data = ServersInEnvironment(url, userid, pw, Environment);
 
@@ -245,13 +246,20 @@ class deployhub
     for (i = 0; i < servers.size(); i++)
     {
       def id = servers[i]['id'];
-      data = ServerRunning(url, userid, pw, "$id");
 
-      def running = data[1]['result']['data'][0][4];
+      if (checkRunning)
+      {
+       data = ServerRunning(url, userid, pw, "$id");
 
-      if (running.equalsIgnoreCase("false"))
-        doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/mod/server/$id/?force=y");
+       def running = data[1]['result']['data'][0][4];
 
+       if (running.equalsIgnoreCase("false"))
+         doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/mod/server/$id/?force=y");
+      }
+      else
+      {
+       doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/mod/server/$id/?force=y"); 
+      }   
     }
   }
 
@@ -268,7 +276,7 @@ class deployhub
   {
     def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/environment/" + enc(Environment));
     if (data.size() == 0)
-      return [false, "Could not test server '" + server];
+      return [false, "Could not get environment: " + Environment];
     else
       return [true, data];
   }
@@ -741,7 +749,7 @@ class deployhub
        data = getApplication(url,userid,pw,appname,"");
        parent_appid = data[0];
       } 
-
+      
       if (envs != null)
       {
         for (def i=0;i<envs.size();i++)
