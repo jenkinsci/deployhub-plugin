@@ -135,10 +135,10 @@ class deployhub
 
   def private Object doHttpRequestWithJson(String userid, String pw, String json, String requestUrl, String verb)
   {
-   if (userid == "")
+   if (userid.length() == 0)
     userid = "@deployhub-cred";
 
-   if (userid.indexOf('@') >0)
+   if (userid.indexOf('@') > 0)
    {
     def cred = userid.substring(1);
     withCredentials([usernamePassword(credentialsId: cred, passwordVariable: 'password', usernameVariable: 'username')]) 
