@@ -135,40 +135,79 @@ class deployhub
 
   def private Object doHttpRequestWithJson(String userid, String pw, String json, String requestUrl, String verb)
   {
+   if (userid.length() == 0)
+    userid = "@deployhub-cred";
 
-    URL url = new URL(requestUrl);
-    HttpURLConnection connection = url.openConnection();
+   if (userid.indexOf('@') > 0)
+   {
+    def cred = userid.substring(1);
+    withCredentials([usernamePassword(credentialsId: cred, passwordVariable: 'password', usernameVariable: 'username')]) 
+    {  
+     URL url = new URL(requestUrl);
+     HttpURLConnection connection = url.openConnection();
 
-    connection.setRequestMethod(verb);
-    connection.setRequestProperty("Content-Type", "application/json");
-    connection.setRequestProperty("Cookie", "p1=$userid; p2=$pw");
-    connection.doOutput = true;
+     connection.setRequestMethod(verb);
+     connection.setRequestProperty("Content-Type", "application/json");
+     connection.setRequestProperty("Cookie", "p1=$username; p2=$password");
+     connection.doOutput = true;
 
-    if (json.length() > 0)
-    {
-      //write the payload to the body of the request    
-      def writer = new OutputStreamWriter(connection.outputStream);
-      writer.write(json);
-      writer.flush();
-      writer.close();
-    }
+     if (json.length() > 0)
+     {
+       //write the payload to the body of the request    
+       def writer = new OutputStreamWriter(connection.outputStream);
+       writer.write(json);
+       writer.flush();
+       writer.close();
+     }
+  
+     //post the request    
+     connection.connect();
 
-    //post the request    
-    connection.connect();
+     //parse the response    
+     parseResponse(connection);
 
-    //parse the response    
-    parseResponse(connection);
-
-    if (failure)
-    {
+     if (failure)
+     {
       error("\n$verb to URL: $requestUrl\n    JSON: $json\n    HTTP Status: $statusCode\n    Message: $message\n    Response Body: $body");
       return null;
+     }
+
+     return jsonParse(body);
     }
+   }
+   else
+   {
+     URL url = new URL(requestUrl);
+     HttpURLConnection connection = url.openConnection();
 
-    return jsonParse(body);
+     connection.setRequestMethod(verb);
+     connection.setRequestProperty("Content-Type", "application/json");
+     connection.setRequestProperty("Cookie", "p1=$userid; p2=$pw");
+     connection.doOutput = true;
 
-    //      println("Request ($verb):\n  URL: $requestUrl\n  JSON: $json");    
-    //      println("Response:\n  HTTP Status: $statusCode\n  Message: $message\n  Response Body: $body");      
+     if (json.length() > 0)
+     {
+       //write the payload to the body of the request    
+       def writer = new OutputStreamWriter(connection.outputStream);
+       writer.write(json);
+       writer.flush();
+       writer.close();
+     }
+  
+     //post the request    
+     connection.connect();
+
+     //parse the response    
+     parseResponse(connection);
+
+     if (failure)
+     {
+      error("\n$verb to URL: $requestUrl\n    JSON: $json\n    HTTP Status: $statusCode\n    Message: $message\n    Response Body: $body");
+      return null;
+     }
+
+     return jsonParse(body);
+    }   
   }
 
   @NonCPS
@@ -238,7 +277,7 @@ class deployhub
 
   def forceDeployIfNeeded(String url, String userid, String pw, String Environment, boolean checkRunning)
   {
-    def data = ServersInEnvironment(url, userid, pw, Environment);
+    def data = getServersInEnvironment(url, userid, pw, Environment);
 
     def servers = data[1]['result']['servers'];
 
