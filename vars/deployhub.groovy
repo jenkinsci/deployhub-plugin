@@ -208,7 +208,6 @@ class deployhub
 
      return jsonParse(body);
     }   
-   }  
   }
 
   @NonCPS
