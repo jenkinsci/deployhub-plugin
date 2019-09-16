@@ -742,7 +742,7 @@ class deployhub
      // if (vlist.length > 0)
      //   latest = vlist[vlist - 1];
 
-      return [appid, data, vlist];
+      return [appid, data.result, vlist];
     }
     else
     {
