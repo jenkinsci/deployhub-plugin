@@ -220,7 +220,7 @@ class deployhub
   /**
    * Move an application version to another stage of the pipeline
    * @param url Text the url to the DeployHub server
-   * @param userid Text the DeployHub userid
+   * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
    * @param pw Text the DeployHub password
    * @param Application the application to move
    * @param FromDomain the domain to move from
@@ -270,7 +270,7 @@ class deployhub
   /**
    * Force a deployment to an environment
    * @param url Text the url to the DeployHub server
-   * @param userid Text the DeployHub userid
+   * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
    * @param pw Text the DeployHub password
    * @param Environment Text the environment to reset the deployment
    * @param checkRunning boolean if true then only reset non-running server.  if false ignore running state and reset
@@ -306,7 +306,7 @@ class deployhub
   /**
    * List servers in an environment
    * @param url Text the url to the DeployHub server
-   * @param userid Text the DeployHub userid
+   * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
    * @param pw Text the DeployHub password
    * @param Environment the application to move
    * @return Array with first element being the return code, second Array of servers
@@ -324,7 +324,7 @@ class deployhub
   /**
    * Ping the server to see if its running
    * @param url Text the url to the DeployHub server
-   * @param userid Text the DeployHub userid
+   * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
    * @param pw Text the DeployHub password
    * @param server the server to test
    * @return Array with first element being the return code, second details about the server
@@ -342,7 +342,7 @@ class deployhub
   /**
    * Deploy an application to an environment
    * @param url Text the url to the DeployHub server
-   * @param userid Text the DeployHub userid
+   * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
    * @param pw Text the DeployHub password
    * @param Application Text the Application to deploy
    * @param Environment Text the target Environment
@@ -361,7 +361,7 @@ class deployhub
   /**
    * Get the deployment logs
    * @param url Text the url to the DeployHub server
-   * @param userid Text the DeployHub userid
+   * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
    * @param pw Text the DeployHub password
    * @param deployid Text the deployment id to check
    * @return Array with first element being the return code, second the log data
@@ -411,7 +411,7 @@ class deployhub
   /**
    * Check to see if a deployment is done
    * @param url Text the url to the DeployHub server
-   * @param userid Text the DeployHub userid
+   * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
    * @param pw Text the DeployHub password
    * @param deployid Text the deployment id to check
    * @return Array with first element being the return code, second true/false
@@ -433,7 +433,7 @@ class deployhub
   /**
    * Approve the application version for its current pipeline stage
    * @param url Text the url to the DeployHub server
-   * @param userid Text the DeployHub userid
+   * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
    * @param pw Text the DeployHub password
    * @param Application Text the Application to approve
    * @return Array with first element being the return code, second approval results
@@ -457,7 +457,7 @@ class deployhub
   /**
    * Update the name of the component
    * @param url Text the url to the DeployHub server
-   * @param userid Text the DeployHub userid
+   * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
    * @param pw Text the DeployHub password
    * @param compname Text the new name of the component
    * @param compvariant Text the new variant of the component    
@@ -496,7 +496,7 @@ class deployhub
   /**
     * New Component item for the passed Component 
     * @param url Text the url to the DeployHub server
-    * @param userid Text the DeployHub userid
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
     * @param compid Integer the component that the item belongs to
     * @param kind Text the kind of the item (docker, database, file)   
@@ -513,7 +513,7 @@ class deployhub
   /**
     * New Component  
     * @param url Text the url to the DeployHub server
-    * @param userid Text the DeployHub userid
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
     * @param compname Text the component name
     * @param compvariant Text the variant for the component
@@ -557,7 +557,7 @@ class deployhub
   /**
     * Get the Component Id 
     * @param url Text the url to the DeployHub server
-    * @param userid Text the DeployHub userid
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
     * @param compname Text the component name
     * @param compvariant Text the variant for the component
@@ -624,7 +624,7 @@ class deployhub
   /**
     * Get the Component Id 
     * @param url Text the url to the DeployHub server
-    * @param userid Text the DeployHub userid
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
     * @param compname Text the component name
     * @param compvariant Text the variant for the component
@@ -701,7 +701,7 @@ class deployhub
   /**
     * Get the Application Id 
     * @param url Text the url to the DeployHub server
-    * @param userid Text the DeployHub userid
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
     * @param compname Text the component name
     * @param compvariant Text the variant for the component
@@ -753,7 +753,7 @@ class deployhub
   /**
     * New Application Version  
     * @param url Text the url to the DeployHub server
-    * @param userid Text the DeployHub userid
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
     * @param appname Text the application name
     * @param appversion Text the version of the application
@@ -827,7 +827,7 @@ class deployhub
  /**
     * Assign Components to Application Version  
     * @param url Text the url to the DeployHub server
-    * @param userid Text the DeployHub userid
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
     * @param appname Text the application name
     * @param appversion Text the version of the application
@@ -845,7 +845,7 @@ class deployhub
   /**
     * Update the component attrs 
     * @param url Text the url to the DeployHub server
-    * @param userid Text the DeployHub userid
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
     * @param compname Text the component name
     * @param compvariant Text the variant for the component
