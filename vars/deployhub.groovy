@@ -805,8 +805,11 @@ class deployhub
     
     // Refetch parent to get version list
     data = getApplication(url,userid,pw,appname,"");
-    appid = data[0];
     def latest_appid = data[2];
+
+    // Refetch the current app version to see if we need to create it or not
+    data = getApplication(url,userid,pw,appname, appversion);
+    appid = data[0];
 
     if (appid < 0)
     {  
