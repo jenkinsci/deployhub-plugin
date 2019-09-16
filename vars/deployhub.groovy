@@ -738,10 +738,10 @@ class deployhub
       def appid = data.result.id;
       def name  = data.result.name;
       def latest = -1;
-    //  if (data.result.versions.length > 0)
-    //    latest = data.result.versions[data.result.versions.length - 1];
+      if (data.result.versions.length > 0)
+        latest = data.result.versions[data.result.versions.length - 1];
 
-      return [appid, name, data.toString()];
+      return [appid, name, latest];
     }
     else
     {
