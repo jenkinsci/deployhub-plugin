@@ -138,7 +138,7 @@ class deployhub
    if (userid.length() == 0)
     userid = "@deployhub-cred";
 
-   if (userid.indexOf('@') > 0)
+   if (userid.indexOf('@') >= 0)
    {
     def cred = userid.substring(1);
     def creds = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(com.cloudbees.plugins.credentials.common.StandardUsernameCredentials.class, Jenkins.instance, null, null ).find{it.id == cred};
