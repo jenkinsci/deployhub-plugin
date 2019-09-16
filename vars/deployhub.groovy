@@ -805,7 +805,6 @@ class deployhub
     
     // Refetch parent to get version list
     data = getApplication(url,userid,pw,appname,"");
-     return [data.toString(),""];
     appid = data[0];
     def latest_appid = data[2];
 
