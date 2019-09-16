@@ -141,9 +141,8 @@ class deployhub
    if (userid.indexOf('@') > 0)
    {
     def cred = userid.substring(1);
-    def username = "";
-    def password = "";
-
+    withCredentials([usernamePassword(credentialsId: cred, passwordVariable: 'password', usernameVariable: 'username')]) 
+    {  
      URL url = new URL(requestUrl);
      HttpURLConnection connection = url.openConnection();
 
@@ -174,6 +173,7 @@ class deployhub
      }
 
      return jsonParse(body);
+    }
    }
    else
    {
