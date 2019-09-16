@@ -738,11 +738,11 @@ class deployhub
       def appid = data.result.id;
       def name  = data.result.name;
       def vlist = data.result.versions;
-     // def latest = -1;
-     // if (vlist.length > 0)
-     //   latest = vlist[vlist - 1];
+      def latest = -1;
+      if (vlist.length() > 0)
+        latest = vlist[vlist - 1];
 
-      return [appid, data.result.versions, vlist];
+      return [appid, name, latest];
     }
     else
     {
