@@ -141,8 +141,10 @@ class deployhub
    if (userid.indexOf('@') > 0)
    {
     def cred = userid.substring(1);
-    withCredentials([usernamePassword(credentialsId: cred, passwordVariable: 'password', usernameVariable: 'username')]) 
-    {  
+    def creds = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(com.cloudbees.plugins.credentials.common.StandardUsernameCredentials.class, Jenkins.instance, null, null ).find{it.id == cred};
+    def username = creds.username;
+    def password = creds.password;
+
      URL url = new URL(requestUrl);
      HttpURLConnection connection = url.openConnection();
 
@@ -173,7 +175,6 @@ class deployhub
      }
 
      return jsonParse(body);
-    }
    }
    else
    {
