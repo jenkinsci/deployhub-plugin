@@ -141,7 +141,8 @@ class deployhub
    if (userid.indexOf('@') > 0)
    {
     def cred = userid.substring(1);
-
+    def username = "";
+    def password = "";
 
      URL url = new URL(requestUrl);
      HttpURLConnection connection = url.openConnection();
