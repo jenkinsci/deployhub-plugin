@@ -737,11 +737,12 @@ class deployhub
     {
       def appid = data.result.id;
       def name  = data.result.name;
+      def vlist = data.result.version;
       def latest = -1;
-      if (data.result.versions.length > 0)
-        latest = data.result.versions[data.result.versions.length - 1];
+      if (vlist.length > 0)
+        latest = vlist[vlist - 1];
 
-      return [appid, name, latest];
+      return [appid, name, vlist];
     }
     else
     {
@@ -804,6 +805,7 @@ class deployhub
     
     // Refetch parent to get version list
     data = getApplication(url,userid,pw,appname,"");
+     return [data.String(),""];
     appid = data[0];
     def latest_appid = data[2];
 
