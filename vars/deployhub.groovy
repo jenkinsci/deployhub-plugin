@@ -136,7 +136,7 @@ class deployhub
   def private Object doHttpRequestWithJson(String userid, String pw, String json, String requestUrl, String verb)
   {
    if (userid.length() == 0)
-    userid = "@deployhub-cred";
+    userid = "@deployhub-creds";
 
    if (userid.indexOf('@') >= 0)
    {
