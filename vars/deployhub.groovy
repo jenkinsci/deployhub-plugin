@@ -731,18 +731,21 @@ class deployhub
     def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/application/" + enc(Application));
 
     if (data == null)
-      return [-1, ""];
+      return [-1, "", -1];
 
     if (data.success)
     {
       def appid = data.result.id;
       def name = data.result.name;
+      def latest = -1;
+      if (data.result.versions.length > 0)
+        latest = data.result.versions[data.result.versions.length - 1];
 
-      return [appid, name];
+      return [appid, name, latest];
     }
     else
     {
-      return [-1, ""];
+      return [-1, "", -1];
     }
   }
 
@@ -798,13 +801,21 @@ class deployhub
         }
       }
     }
-       
-    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + parent_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
+    
+    // Refetch parent to get version list
+    data = getApplication(url,userid,pw,appname,"");
+    appid = data[0];
+    def latest_appid = data[2];
 
-    if (!data.success)
-     return [-1,data.error]; 
+    if (appid < 0)
+    {  
+     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + latest_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
 
-    appid = data.result.id;
+     if (!data.success)
+      return [-1,data.error]; 
+
+     appid = data.result.id;
+    } 
     
     return [appid,""];
   }
