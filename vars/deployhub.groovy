@@ -512,10 +512,10 @@ class deployhub
     else
     {
      def ypos = 100;
-     for (def i=0;i<component_items.length();i++)
+     
+     def i = 0;
+     for (Map item : component_items)
      {
-      Map item = component_items[i];
-      
       def str = "";
       for (entry in item) {
         str += "&" + $entry.key + "=" + $entry.value;
@@ -526,6 +526,7 @@ class deployhub
 
       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/new/compitem?component=" + compid + "&xpos=100&ypos=" + ypos + "&kind=" + kind + str);
       ypos += 100;
+      i++;
      }
     }   
     return data;
