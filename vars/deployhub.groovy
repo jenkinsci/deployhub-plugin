@@ -503,25 +503,68 @@ class deployhub
     * @return Boolean success/failure
     **/
 
-  def newComponentItem(String url, String userid, String pw, Integer compid, String kind)
+  def newComponentItem(String url, String userid, String pw, Integer compid, String kind, List component_items)
   {
-    // Get compId    
-    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=inv&c=" + compid + "&xpos=100&ypos=100&kind=" + kind + "&removeall=Y");
+    def data;
+    // Get compId   
+    if (kind.equalsIgnoreCase("docker") || component_items == null) 
+       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=inv&c=" + compid + "&xpos=100&ypos=100&kind=" + kind + "&removeall=Y");
+    else
+    {
+     def ypos = 100;
+     for (def i=0;i<component_items.length();i++)
+     {
+      Map item = component_items[i];
+      
+      def str = "";
+      for (entry in item) {
+        str += "&" + $entry.key + "=" + $entry.value;
+      }
+
+      if (i == 0)
+       str += "&removeall=Y";
+
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/new/compitem?component=" + compid + "&xpos=100&ypos=" + ypos + "&kind=" + kind + str);
+      ypos += 100;
+     }
+    }   
     return data;
   }
 
   /**
-    * New Component  
+    * New Docker Component  
     * @param url Text the url to the DeployHub server
     * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
     * @param compname Text the component name
     * @param compvariant Text the variant for the component
     * @param compversion Text the version of the variant
+    * @param kind Text use "docker" for a container type component
+    * @param parent_compid Integer the parent to derive the new version from.  Use -1 for base version
     * @return Boolean success/failure
     **/
 
   def newComponent(String url, String userid, String pw, String compname, String compvariant, String compversion, String kind, Integer parent_compid)
+  {
+   if (kind.equalsIgnoreCase("docker"))
+    return newDockerComponent(url, userid, pw, compname, compvariant, compversion, parent_compid);
+   else
+    return newFileComponent(url, userid, pw, compname, compvariant, compversion, parent_compid, null);
+  }
+
+  /**
+    * New Docker Component  
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param compname Text the component name
+    * @param compvariant Text the variant for the component
+    * @param compversion Text the version of the variant
+    * @param parent_compid Integer the parent to derive the new version from.  Use -1 for base version
+    * @return Boolean success/failure
+    **/
+
+  def newDockerComponent(String url, String userid, String pw, String compname, String compvariant, String compversion, Integer parent_compid)
   {
     compvariant = cleanName(compvariant);
     compversion = cleanName(compversion);
@@ -548,10 +591,55 @@ class deployhub
 
     updateName(url, userid, pw, compname, compvariant, compversion, compid);
 
-    if (kind != "")
-      newComponentItem(url, userid, pw, compid, kind);
+    newComponentItem(url, userid, pw, compid, "docker", null);
 
     return compid;
+  }
+
+  /**
+    * New Component  
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param compname Text the component name
+    * @param compvariant Text the variant for the component
+    * @param compversion Text the version of the variant
+    * @param kind Text use "docker" for a container type component
+    * @param parent_compid Integer the parent to derive the new version from.  Use -1 for base version
+    * @param component_items List an array of Maps for the component item properties  
+    * @return Boolean success/failure
+    **/
+
+  def newFileComponent(String url, String userid, String pw, String compname, String compvariant, String compversion, Integer parent_compid, List component_items)
+  {
+    compvariant = cleanName(compvariant);
+    compversion = cleanName(compversion);
+
+    if (compvariant == "" && compversion != null && compversion != "")
+    {
+      compvariant = compversion;
+      compversion = null;  
+    }
+
+    def compid = 0;
+    def data;
+    // Create base version
+    if (parent_compid < 0)
+    {
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compver/" + enc(compname + ";" + compvariant));
+      compid = data.result.id;
+    }
+    else
+    {
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compver/" + parent_compid);
+      compid = data.result.id;
+    }
+
+    updateName(url, userid, pw, compname, compvariant, compversion, compid);
+    
+    newComponentItem(url, userid, pw, compid, "file", component_items);
+   }
+   return compid;
   }
 
   /**
@@ -566,6 +654,22 @@ class deployhub
     **/
 
   def newComponentVersion(String url, String userid, String pw, String compname, String compvariant, String compversion)
+  {
+   return newComponentVersion(url, userid, pw, compname, compvariant, compversion, "docker");
+  }
+
+  /**
+    * Get the Component Id 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param compname Text the component name
+    * @param compvariant Text the variant for the component
+    * @param compversion Text the version of the variant
+    * @return component id, -1 for not found
+    **/
+
+  def newComponentVersion(String url, String userid, String pw, String compname, String compvariant, String compversion, String kind, List component_items)
   {
     compvariant = cleanName(compvariant);
     compversion = cleanName(compversion);
@@ -617,7 +721,13 @@ class deployhub
     // Create new version of component variant base on latest comp variant# Get the new compid
     // for the new version of the component variant
     if (found_compname == "" || found_compname != check_compname)
-      compid = newComponent(url, userid, pw, compname, compvariant, compversion, 'docker', compid);
+    {
+     if (kind.equalsIgnoreCase("docker"))
+       compid = newDockerComponent(url, userid, pw, compname, compvariant, compversion, compid);
+     else
+       compid = newFileComponent(url, userid, pw, compname, compvariant, compversion, compid, component_items);     
+    }
+      
     return compid;
   }
 
