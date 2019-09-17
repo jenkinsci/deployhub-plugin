@@ -520,7 +520,7 @@ class deployhub
       def ciname = "";
       for (entry in item) {
         if (entry.key.equalsIgnoreCase("name"))
-         name = entry.value;
+         ciname = entry.value;
         else
          str += "&" +enc(entry.key) + "=" + enc(entry.value);
       }
@@ -528,7 +528,7 @@ class deployhub
       if (i == 0)
        str += "&removeall=Y";
 
-      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compitem/" + enc(name) + "?component=" + compid + "&xpos=100&ypos=" + ypos + "&kind=" + kind + str);
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compitem/" + enc(ciname) + "?component=" + compid + "&xpos=100&ypos=" + ypos + "&kind=" + kind + str);
       ypos += 100;
       i++;
      }
