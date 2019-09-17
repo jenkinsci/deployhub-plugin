@@ -655,7 +655,7 @@ class deployhub
 
   def newComponentVersion(String url, String userid, String pw, String compname, String compvariant, String compversion)
   {
-   return newComponentVersion(url, userid, pw, compname, compvariant, compversion, "docker");
+   return newComponentVersion(url, userid, pw, compname, compvariant, compversion, "docker", null);
   }
 
   /**
