@@ -517,14 +517,18 @@ class deployhub
      for (Map item : component_items)
      {
       def str = "";
+      def ciname = "";
       for (entry in item) {
-        str += "&" +enc(entry.key) + "=" + enc(entry.value);
+        if (entry.key.equalsIgnoreCase("name"))
+         name = entry.value;
+        else
+         str += "&" +enc(entry.key) + "=" + enc(entry.value);
       }
 
       if (i == 0)
        str += "&removeall=Y";
 
-      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compitem?component=" + compid + "&xpos=100&ypos=" + ypos + "&kind=" + kind + str);
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compitem/" + enc(name) + "?component=" + compid + "&xpos=100&ypos=" + ypos + "&kind=" + kind + str);
       ypos += 100;
       i++;
      }
