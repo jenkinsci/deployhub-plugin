@@ -855,7 +855,7 @@ class deployhub
       def vlist = data.result.versions;
       def latest = -1;
 
-      if (vlist != null && vlist.last() != null)
+      if (vlist != null && vlist.size() > 0 && vlist.last() != null)
         latest = vlist.last().id;
 
       return [appid, name, latest];
