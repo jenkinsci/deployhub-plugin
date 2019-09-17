@@ -518,7 +518,7 @@ class deployhub
      {
       def str = "";
       for (entry in item) {
-        str += "&" + $entry.key + "=" + $entry.value;
+        str += "&" + entry.key + "=" + entry.value;
       }
 
       if (i == 0)
