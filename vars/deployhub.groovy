@@ -518,13 +518,13 @@ class deployhub
      {
       def str = "";
       for (entry in item) {
-        str += "&" + entry.key + "=" + entry.value;
+        str += "&" +enc(entry.key) + "=" + enc(entry.value);
       }
 
       if (i == 0)
        str += "&removeall=Y";
 
-      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/new/compitem?component=" + compid + "&xpos=100&ypos=" + ypos + "&kind=" + kind + str);
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compitem?component=" + compid + "&xpos=100&ypos=" + ypos + "&kind=" + kind + str);
       ypos += 100;
       i++;
      }
