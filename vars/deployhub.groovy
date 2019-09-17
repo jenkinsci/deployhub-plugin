@@ -518,7 +518,8 @@ class deployhub
      {
       def str = "";
       def ciname = "";
-      for (entry in item) {
+      for (entry in item) 
+      {
         if (entry.key.equalsIgnoreCase("name"))
          ciname = entry.value;
         else
@@ -723,8 +724,7 @@ class deployhub
         compid = newComponent(url, userid, pw, compname, compvariant, "", "", -1);
     }
     
-    // Create new version of component variant base on latest comp variant# Get the new compid
-    // for the new version of the component variant
+    // Create component items for the component 
     if (found_compname == "" || found_compname != check_compname)
     {
      if (kind.equalsIgnoreCase("docker"))
@@ -856,9 +856,12 @@ class deployhub
       def latest = -1;
 
       if (vlist != null && vlist.size() > 0 && vlist.last() != null)
+      {
         latest = vlist.last().id;
-
-      return [appid, name, latest];
+        return [appid, name, latest];
+      }
+      else
+        return [appid, name, appid];
     }
     else
     {
