@@ -638,8 +638,8 @@ class deployhub
     updateName(url, userid, pw, compname, compvariant, compversion, compid);
     
     newComponentItem(url, userid, pw, compid, "file", component_items);
-   }
-   return compid;
+  
+    return compid;
   }
 
   /**
