@@ -514,6 +514,8 @@ class deployhub
      def ypos = 100;
      
      def i = 0;
+     def parent_item = -1;
+
      for (Map item : component_items)
      {
       def str = "";
@@ -530,6 +532,10 @@ class deployhub
        str += "&removeall=Y";
 
       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compitem/" + enc(ciname) + "?component=" + compid + "&xpos=100&ypos=" + ypos + "&kind=" + kind + str);
+      
+      if (parent_item > 0)
+        doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=iad&c=" + compid + "&fn=" + parent_item + "&tn=" + data.result.id;
+      parent_item = data.result.id;
       ypos += 100;
       i++;
      }
