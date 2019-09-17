@@ -534,8 +534,8 @@ class deployhub
       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compitem/" + enc(ciname) + "?component=" + compid + "&xpos=100&ypos=" + ypos + "&kind=" + kind + str);
       
       if (parent_item > 0)
-        doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=iad&c=" + compid + "&fn=" + parent_item + "&tn=" + data.result.id);
-      parent_item = data.result.id;
+        doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=iad&c=" + compid + "&fn=" + parent_item + "&tn=" + data.id);
+      parent_item = data.id;
       ypos += 100;
       i++;
      }
