@@ -639,6 +639,7 @@ class deployhub
     if (parent_compid < 0)
     {
       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compver/" + enc(compname + ";" + compvariant));
+      return data;
       compid = data.result.id;
     }
     else
