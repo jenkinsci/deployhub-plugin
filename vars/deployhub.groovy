@@ -1001,8 +1001,6 @@ class deployhub
 
     if (data.success)
     {
-      def appid = data.result.id;
-      def name  = data.result.name;
       def complist = data.result.components;
 
       if (complist != null)
