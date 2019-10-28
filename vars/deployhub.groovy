@@ -949,6 +949,85 @@ class deployhub
     return [appid,""];
   }
 
+   /**
+    * Get a Component version's base component id 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param compid Integer the component version id
+    * @return Integer the base component id 
+    **/
+
+  def getBaseComponent(String url, String userid, String pw, Integer compid)
+  {
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/component/" + compid);
+    
+    if (data == null)
+      return [-1, "", -1];
+
+    def basecompid = -1;
+    while (data.result.predecessor != null)
+    {
+     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/component/" + data.result.predecessor.id);
+    
+     if (data == null)
+       break;
+    }
+    return data.result.id; 
+  }  
+
+ /**
+    * Adds a Component version to Application Version, replacing existing component versions derived from the same base  
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param appid Integer the application version id
+    * @param compid Integer the component version id
+    * @return Boolean success/failure
+    **/
+
+  def addCompVer2AppVer(String url, String userid, String pw, Integer appid, Integer compid)
+  {
+    def replaceCompId = -1;
+    def basecompid = getBaseComponent(url, userid, pw, compid);
+    def lastcompid = 0;
+    def xpos = 100;
+    def ypos = 100;
+
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/application/" + appid);
+    
+    if (data == null)
+      return [-1, "", -1];
+
+    if (data.success)
+    {
+      def appid = data.result.id;
+      def name  = data.result.name;
+      def complist = data.result.components;
+
+      if (complist != null)
+      {
+       for (comp in complist)
+       {
+         def app_basecompid = getBaseComponent(url, userid, pw, comp.id);
+         if (app_basecompid == basecompid)
+          replaceCompId = comp.id;
+         
+         lastcompid = comp.id;
+       }
+      }         
+    }
+
+    if (replaceCompId >= 0)
+    {
+     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/replace/" + appid + "/" + replaceCompId + "/" + compid);
+    }
+    else
+    {
+     assignComp2App(url, userid, pw, appid, compid, lastcompid, xpos, ypos);
+    }  
+   }
+
  /**
     * Assign Components to Application Version  
     * @param url Text the url to the DeployHub server
