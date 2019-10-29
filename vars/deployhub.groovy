@@ -639,7 +639,6 @@ class deployhub
     if (parent_compid < 0)
     {
       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compver/" + enc(compname + ";" + compvariant));
-      return data;
       compid = data.result.id;
     }
     else
@@ -725,13 +724,12 @@ class deployhub
     // Get the new compid of the new component variant
     if (compid < 0)
     {
-      if (compversion == null) 
+      if (compversion == null || compversion == "") 
         compid = newComponent(url, userid, pw, compname, "", "", "", -1);
       else
         compid = newComponent(url, userid, pw, compname, compvariant, "", "", -1);
     }
-        return compid;
-        
+
     // Create component items for the component 
     if (found_compname == "" || found_compname != check_compname)
     {
