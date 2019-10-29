@@ -734,6 +734,7 @@ class deployhub
     // Create component items for the component 
     if (found_compname == "" || found_compname != check_compname)
     {
+      return compid;
      if (kind.equalsIgnoreCase("docker"))
        compid = newDockerComponent(url, userid, pw, compname, compvariant, compversion, compid);
      else
