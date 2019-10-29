@@ -730,7 +730,8 @@ class deployhub
       else
         compid = newComponent(url, userid, pw, compname, compvariant, "", "", -1);
     }
-    
+        return compid;
+        
     // Create component items for the component 
     if (found_compname == "" || found_compname != check_compname)
     {
