@@ -1002,6 +1002,7 @@ class deployhub
     if (data.success)
     {
       def complist = data.result.components;
+      lastcompid = data.result.lastcompver;
 
       if (complist != null)
       {
@@ -1010,8 +1011,12 @@ class deployhub
          def app_basecompid = getBaseComponent(url, userid, pw, comp.id);
          if (app_basecompid == basecompid)
           replaceCompId = comp.id;
-         
-         lastcompid = comp.id;
+
+         if (comp.id == lastcompid)
+         {
+          xpos = comp.xpos;
+          ypos = comp.ypos; 
+         }
        }
       }         
     }
