@@ -655,6 +655,52 @@ class deployhub
   }
 
   /**
+    * New Component  
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param compname Text the component name
+    * @param compvariant Text the variant for the component
+    * @param compversion Text the version of the variant
+    * @param kind Text use "docker" for a container type component
+    * @param parent_compid Integer the parent to derive the new version from.  Use -1 for base version
+    * @param component_items List an array of Maps for the component item properties  
+    * @return Boolean success/failure
+    **/
+
+  def newFileComponent(String url, String userid, String pw, String compname, String compvariant, String compversion, Integer parent_compid, List component_items)
+  {
+    compvariant = cleanName(compvariant);
+    compversion = cleanName(compversion);
+
+    if (compvariant == "" && compversion != null && compversion != "")
+    {
+      compvariant = compversion;
+      compversion = null;  
+    }
+
+    def compid = 0;
+    def data;
+    // Create base version
+    if (parent_compid < 0)
+    {
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compver/" + enc(compname + ";" + compvariant));
+      compid = data.result.id;
+    }
+    else
+    {
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compver/" + parent_compid);
+      compid = data.result.id;
+    }
+
+    updateName(url, userid, pw, compname, compvariant, compversion, compid);
+    
+    newComponentItem(url, userid, pw, compid, "file", component_items);
+  
+    return compid;
+  }
+
+  /**
     * Get the Component Id 
     * @param url Text the url to the DeployHub server
     * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
@@ -724,12 +770,11 @@ class deployhub
     // Get the new compid of the new component variant
     if (compid < 0)
     {
-      if (compversion == null) 
+      if (compversion == null || compversion == "") 
         compid = newComponent(url, userid, pw, compname, "", "", "", -1);
       else
         compid = newComponent(url, userid, pw, compname, compvariant, "", "", -1);
     }
-    
     // Create component items for the component 
     if (found_compname == "" || found_compname != check_compname)
     {
@@ -948,6 +993,88 @@ class deployhub
     
     return [appid,""];
   }
+
+   /**
+    * Get a Component version's base component id 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param compid Integer the component version id
+    * @return Integer the base component id 
+    **/
+
+  def getBaseComponent(String url, String userid, String pw, Integer compid)
+  {
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/component/" + compid);
+    
+    if (data == null)
+      return [-1, "", -1];
+
+    def basecompid = -1;
+    while (data.result.predecessor != null)
+    {
+     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/component/" + data.result.predecessor.id);
+    
+     if (data == null)
+       break;
+    }
+    return data.result.id; 
+  }  
+
+ /**
+    * Adds a Component version to Application Version, replacing existing component versions derived from the same base  
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param appid Integer the application version id
+    * @param compid Integer the component version id
+    * @return Boolean success/failure
+    **/
+
+  def addCompVer2AppVer(String url, String userid, String pw, Integer appid, Integer compid)
+  {
+    def replaceCompId = -1;
+    def basecompid = getBaseComponent(url, userid, pw, compid);
+    def lastcompid = 0;
+    def xpos = 100;
+    def ypos = 100;
+
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/application/" + appid);
+    
+    if (data == null)
+      return [-1, "", -1];
+
+    if (data.success)
+    {
+      def complist = data.result.components;
+      lastcompid = data.result.lastcompver;
+
+      if (complist != null)
+      {
+       for (comp in complist)
+       {
+         def app_basecompid = getBaseComponent(url, userid, pw, comp.id);
+         if (app_basecompid == basecompid)
+          replaceCompId = comp.id;
+
+         if (comp.id == lastcompid)
+         {
+          xpos = comp.xpos;
+          ypos = comp.ypos + 100; 
+         }
+       }
+      }         
+    }
+
+    if (replaceCompId >= 0)
+    {
+     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/replace/" + appid + "/" + replaceCompId + "/" + compid);
+    }
+    else
+    {
+     assignComp2App(url, userid, pw, appid, compid, lastcompid, xpos, ypos);
+    }  
+   }
 
  /**
     * Assign Components to Application Version  
