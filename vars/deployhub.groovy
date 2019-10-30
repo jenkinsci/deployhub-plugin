@@ -655,52 +655,6 @@ class deployhub
   }
 
   /**
-    * New Component  
-    * @param url Text the url to the DeployHub server
-    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
-    * @param pw Text the DeployHub password
-    * @param compname Text the component name
-    * @param compvariant Text the variant for the component
-    * @param compversion Text the version of the variant
-    * @param kind Text use "docker" for a container type component
-    * @param parent_compid Integer the parent to derive the new version from.  Use -1 for base version
-    * @param component_items List an array of Maps for the component item properties  
-    * @return Boolean success/failure
-    **/
-
-  def newFileComponent(String url, String userid, String pw, String compname, String compvariant, String compversion, Integer parent_compid, List component_items)
-  {
-    compvariant = cleanName(compvariant);
-    compversion = cleanName(compversion);
-
-    if (compvariant == "" && compversion != null && compversion != "")
-    {
-      compvariant = compversion;
-      compversion = null;  
-    }
-
-    def compid = 0;
-    def data;
-    // Create base version
-    if (parent_compid < 0)
-    {
-      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compver/" + enc(compname + ";" + compvariant));
-      compid = data.result.id;
-    }
-    else
-    {
-      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compver/" + parent_compid);
-      compid = data.result.id;
-    }
-
-    updateName(url, userid, pw, compname, compvariant, compversion, compid);
-    
-    newComponentItem(url, userid, pw, compid, "file", component_items);
-  
-    return compid;
-  }
-
-  /**
     * Get the Component Id 
     * @param url Text the url to the DeployHub server
     * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
