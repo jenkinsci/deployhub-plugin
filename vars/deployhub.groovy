@@ -1015,7 +1015,7 @@ class deployhub
          if (comp.id == lastcompid)
          {
           xpos = comp.xpos;
-          ypos = comp.ypos; 
+          ypos = comp.ypos + 100; 
          }
        }
       }         
