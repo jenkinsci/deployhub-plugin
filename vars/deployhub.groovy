@@ -1022,7 +1022,7 @@ class deployhub
 
     if (replaceCompId >= 0)
     {
-     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/replace/" + appid + "/" + replaceCompId + "/" + compid);
+     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/replace/" + appid + "/" + replaceCompId + "/" + compid);
     }
     else
     {
