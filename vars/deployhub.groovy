@@ -731,12 +731,19 @@ class deployhub
     }
 
     // Create component items for the component 
-    if (found_compname == "" || found_compname != check_compname || (found_compname == check_compname && kind.equalsIgnoreCase("file")))
+    if (found_compname == "" || found_compname != check_compname)
     {
      if (kind.equalsIgnoreCase("docker"))
        compid = newDockerComponent(url, userid, pw, compname, compvariant, compversion, compid);
      else
        compid = newFileComponent(url, userid, pw, compname, compvariant, compversion, compid, component_items);     
+    }
+    else if (compid > 0)
+    {
+     if (kind.equalsIgnoreCase("docker"))
+       newComponentItem(url, userid, pw, compid, "docker", null);
+     else
+       newComponentItem(url, userid, pw, compid, "file", component_items); 
     }
       
     return compid;
