@@ -535,7 +535,7 @@ class deployhub
       
       if (parent_item > 0)
         doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=iad&c=" + compid + "&fn=" + parent_item + "&tn=" + data.id);
-      parent_item = data.id;
+      parent_item = data.result.id;
       ypos += 100;
       i++;
      }
