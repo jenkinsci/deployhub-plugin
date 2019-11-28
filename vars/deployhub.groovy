@@ -533,9 +533,12 @@ class deployhub
 
       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/compitem/" + enc(ciname) + "?component=" + compid + "&xpos=100&ypos=" + ypos + "&kind=" + kind + str);
       
-    //  if (parent_item > 0)
-    //    doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=iad&c=" + compid + "&fn=" + parent_item + "&tn=" + data.id);
-    //  parent_item = data.id;
+      if (data.size() > 0 && data.result)
+      {
+       if (parent_item > 0)
+          doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/UpdateAttrs?f=iad&c=" + compid + "&fn=" + parent_item + "&tn=" + data.result.id);
+       parent_item = data.result.id;
+      }
       ypos += 100;
       i++;
      }
@@ -729,6 +732,7 @@ class deployhub
       else
         compid = newComponent(url, userid, pw, compname, compvariant, "", "", -1);
     }
+
     // Create component items for the component 
     if (found_compname == "" || found_compname != check_compname)
     {
@@ -736,6 +740,13 @@ class deployhub
        compid = newDockerComponent(url, userid, pw, compname, compvariant, compversion, compid);
      else
        compid = newFileComponent(url, userid, pw, compname, compvariant, compversion, compid, component_items);     
+    }
+    else if (compid > 0)
+    {
+     if (kind.equalsIgnoreCase("docker"))
+       newComponentItem(url, userid, pw, compid, "docker", null);
+     else
+       newComponentItem(url, userid, pw, compid, "file", component_items); 
     }
       
     return compid;
