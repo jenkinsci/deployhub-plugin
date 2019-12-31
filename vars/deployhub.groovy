@@ -397,6 +397,7 @@ class deployhub
       return [false, "Could not get log #" + deployid];
 
     def lines = data['logoutput'];
+    def exitcode = data['exitcode'];
     def output = "";
 
     def i = 0;
@@ -405,7 +406,10 @@ class deployhub
       output += lines[i] + "\n";
     }
 
-    return [true, output];
+    if (exitcode == 0)
+      return [true, output];
+    else 
+      return [false, output]; 
   }
 
   /**
