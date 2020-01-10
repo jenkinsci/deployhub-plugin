@@ -9,7 +9,7 @@ class deployhub
   private String pw = "";
   private Integer statusCode;
   private boolean failure = false;
-
+  private boolean skipIncremental = true;
 
   @NonCPS
   def private _getURL(text)
@@ -932,16 +932,16 @@ class deployhub
        data = getApplication(url,userid,pw,appname,"");
        parent_appid = data[0];
       } 
-      
-      if (envs != null)
-      {
+    }
+
+    if (envs != null)
+    {
         for (def i=0;i<envs.size();i++)
         {
          data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/application/" + enc(appname) + "/" + enc(envs[i])); 
         }
-      }
     }
-    
+
     // Refetch parent to get version list
     data = getApplication(url,userid,pw,appname,"");
     def latest_appid = data[2];
@@ -958,7 +958,15 @@ class deployhub
       return [-1,data.error]; 
 
      appid = data.result.id;
-    } 
+    }
+
+    if (skipIncremental)
+    {
+      for (def i=0;i<envs.size();i++)
+      {
+       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/application/" + appid + "/" + enc(envs[i])); 
+      }    
+    }
     
     return [appid,""];
   }
@@ -1132,4 +1140,15 @@ class deployhub
     else
       return [false, "No attributes to update on '" + Component + "'"];
   }
+
+ /**
+    * Set Config Options  
+    * @param skipIncremental boolean skip incremental deployments (default true)
+    **/
+
+  def setConfig(boolean skip)
+  {
+    skipIncremental = skip;
+    def data;
+  }  
 }
