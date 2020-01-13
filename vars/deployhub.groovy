@@ -1235,6 +1235,7 @@ class deployhub
   {
     // Get envid   
     def envid = getEnvironment(url, userid, pw, envname);
+    def data = "";
 
     if (envid < 0)
       return;
