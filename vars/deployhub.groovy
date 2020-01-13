@@ -844,7 +844,7 @@ class deployhub
 
   def getEnvironment(String url, String userid, String pw, String envname)
   {
-    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/emvironment/" + enc(envname));
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/environment/" + enc(envname));
 
     if (data == null)
       return -1;
