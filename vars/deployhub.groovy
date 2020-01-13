@@ -834,6 +834,33 @@ class deployhub
   }
 
   /**
+    * Get the Environment Id 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param envname Text the environment name
+    * @return environment id, "" for not found
+    **/
+
+  def getEnvironment(String url, String userid, String pw, String envname)
+  {
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/emvironment/" + enc(envname));
+
+    if (data == null)
+      return -1;
+
+    if (data.success)
+    {
+      def envid = data.result.id;
+      return envid;
+    }
+    else
+    {
+      return -1;
+    }
+  }
+
+  /**
     * Get the Application Id 
     * @param url Text the url to the DeployHub server
     * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
@@ -1142,6 +1169,109 @@ class deployhub
   }
 
  /**
+    * Update the application attrs 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param appname Text the name of the application    
+    * @param appversion Text the version of the application
+    * @param Attrs Map the key values pairs of attrs
+    * @return Array with first element being the return code, second msg
+    **/
+
+  def updateApplicationAttrs(String url, String userid, String pw, String appname, String appversion,  Map Attrs)
+  {
+    appname = cleanName(appname);
+    appversion = cleanName(appversion);
+
+    // Get appid    
+    def data = getApplication(url, userid, pw, appname, appversion);
+    def appid = data[0];
+
+    if (appid < 0)
+      return;
+
+    def count = 0;
+    def i = 0;
+    def attr_str = "";
+
+    Attrs.eachWithIndex
+    {
+      key,value,index ->
+      if (value == null)
+        value = ""
+
+      if (count == 0)
+        attr_str = attr_str + "name=" + enc(key) + "&value=" + enc(value);
+      else
+        attr_str = attr_str + "&name" + count + "=" + enc(key) + "&value" + count + "=" + enc(value);
+
+      count = count + 1;
+    }
+
+    if (attr_str.length() > 0)
+    {
+      // Update Attrs for component
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/setvar/application/" + appid + "?" + attr_str);
+      if (data.size() == 0)
+        return [false, "Could not update attributes on '" + appname + "'"];
+      else
+        return [true, data, "${url}/dmadminweb/API/setvar/application/" + appid + "?" + attr_str];
+    }
+    else
+      return [false, "No attributes to update on '" + appname + "'"];
+  }
+
+ /**
+    * Update the environment attrs 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param envname Text the name of the environment    
+    * @param Attrs Map the key values pairs of attrs
+    * @return Array with first element being the return code, second msg
+    **/
+
+  def updateEnvironmentAttrs(String url, String userid, String pw, String envname, Map Attrs)
+  {
+    // Get envid   
+    def envid = getEnvironment(url, userid, pw, envname);
+
+    if (envid < 0)
+      return;
+
+    def count = 0;
+    def i = 0;
+    def attr_str = "";
+
+    Attrs.eachWithIndex
+    {
+      key,value,index ->
+      if (value == null)
+        value = ""
+
+      if (count == 0)
+        attr_str = attr_str + "name=" + enc(key) + "&value=" + enc(value);
+      else
+        attr_str = attr_str + "&name" + count + "=" + enc(key) + "&value" + count + "=" + enc(value);
+
+      count = count + 1;
+    }
+
+    if (attr_str.length() > 0)
+    {
+      // Update Attrs for component
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/setvar/environment/" + envid + "?" + attr_str);
+      if (data.size() == 0)
+        return [false, "Could not update attributes on '" + envname + "'"];
+      else
+        return [true, data, "${url}/dmadminweb/API/setvar/application/" + envid + "?" + attr_str];
+    }
+    else
+      return [false, "No attributes to update on '" + envname + "'"];
+  }
+
+ /**
     * Set Config Options  
     * @param skipIncremental boolean skip incremental deployments (default true)
     **/
@@ -1149,6 +1279,5 @@ class deployhub
   def setConfig(boolean skip)
   {
     skipIncremental = skip;
-    def data;
   }  
 }
