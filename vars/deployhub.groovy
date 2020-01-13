@@ -1271,6 +1271,57 @@ class deployhub
       return [false, "No attributes to update on '" + envname + "'"];
   }
 
+/**
+    * Update the endpoint attrs 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param endpointname Text the name of the endpoint    
+    * @param Attrs Map the key values pairs of attrs
+    * @return Array with first element being the return code, second msg
+    **/
+
+  def updateEndpointAttrs(String url, String userid, String pw, String endpointname, Map Attrs)
+  {
+    // Get envid   
+    def epid = getEndpoint(url, userid, pw, endpointname);
+    def data = "";
+
+    if (epid < 0)
+      return;
+
+    def count = 0;
+    def i = 0;
+    def attr_str = "";
+
+    Attrs.eachWithIndex
+    {
+      key,value,index ->
+      if (value == null)
+        value = ""
+
+      if (count == 0)
+        attr_str = attr_str + "name=" + enc(key) + "&value=" + enc(value);
+      else
+        attr_str = attr_str + "&name" + count + "=" + enc(key) + "&value" + count + "=" + enc(value);
+
+      count = count + 1;
+    }
+
+    if (attr_str.length() > 0)
+    {
+      // Update Attrs for component
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/setvar/server/" + epid + "?" + attr_str);
+      if (data.size() == 0)
+        return [false, "Could not update attributes on '" + endpointname + "'"];
+      else
+        return [true, data, "${url}/dmadminweb/API/setvar/server/" + epid + "?" + attr_str];
+    }
+    else
+      return [false, "No attributes to update on '" + endpointname + "'"];
+  }
+
+
  /**
     * Set Config Options  
     * @param skipIncremental boolean skip incremental deployments (default true)
