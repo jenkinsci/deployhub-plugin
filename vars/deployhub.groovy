@@ -861,6 +861,33 @@ class deployhub
   }
 
   /**
+    * Get the Endpoint Id 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param endpointname Text the endpoint name
+    * @return endpoint id, "" for not found
+    **/
+
+  def getEndpoint(String url, String userid, String pw, String endpointname)
+  {
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/server/" + enc(endpointname));
+
+    if (data == null)
+      return -1;
+
+    if (data.success)
+    {
+      def epid = data.result.id;
+      return epid;
+    }
+    else
+    {
+      return -1;
+    }
+  }
+
+  /**
     * Get the Application Id 
     * @param url Text the url to the DeployHub server
     * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
