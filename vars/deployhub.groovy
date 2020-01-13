@@ -1181,7 +1181,6 @@ class deployhub
 
   def updateApplicationAttrs(String url, String userid, String pw, String appname, String appversion,  Map Attrs)
   {
-    appname = cleanName(appname);
     appversion = cleanName(appversion);
 
     // Get appid    
@@ -1265,7 +1264,7 @@ class deployhub
       if (data.size() == 0)
         return [false, "Could not update attributes on '" + envname + "'"];
       else
-        return [true, data, "${url}/dmadminweb/API/setvar/application/" + envid + "?" + attr_str];
+        return [true, data, "${url}/dmadminweb/API/setvar/environment/" + envid + "?" + attr_str];
     }
     else
       return [false, "No attributes to update on '" + envname + "'"];
