@@ -1025,6 +1025,88 @@ class deployhub
     return [appid,""];
   }
 
+  /**
+    * New Application Version From Base Version
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param appname Text the application name
+    * @param appversion Text the version of the application
+    * @param envs String Array the environments the base version should be assigned to
+    * @return Boolean success/failure
+    **/
+
+  def newApplicationFromBase(String url, String userid, String pw, String appname, String appversion, String[] envs)
+  {
+    appversion = cleanName(appversion);
+
+    def appid = 0;
+    def data;
+    def parent_appid = -1;
+
+    def domain = ""
+    if (appname.indexOf('.') >= 0)
+    {
+     def parts = appname.tokenize('.');
+     if (parts.size() > 0)
+        parts.remove( parts.size() - 1 );
+     domain = parts.join('.');
+     domain="domain=" + enc(domain);
+     appname = appname.tokenize('.').last();
+    }
+
+    // Get Base Version
+    data = getApplication(url,userid,pw,appname,"");
+    parent_appid = data[0];
+
+    // Create base version
+    if (parent_appid < 0)
+    {
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/application/" + enc(appname) + "?" + domain);
+      if (data.success)
+      {
+       data = getApplication(url,userid,pw,appname,"");
+       parent_appid = data[0];
+      } 
+    }
+
+    if (envs != null)
+    {
+        for (def i=0;i<envs.size();i++)
+        {
+         data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/application/" + enc(appname) + "/" + enc(envs[i])); 
+        }
+    }
+
+    // Refetch parent to get version list
+    // data = getApplication(url,userid,pw,appname,"");
+    // def latest_appid = data[2];
+
+    // Refetch the current app version to see if we need to create it or not
+    data = getApplication(url,userid,pw,appname, appversion);
+    appid = data[0];
+
+    if (appid < 0)
+    {  
+     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + parent_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
+
+     if (!data.success)
+      return [-1,data.error]; 
+
+     appid = data.result.id;
+    }
+
+    if (skipIncremental)
+    {
+      for (def i=0;i<envs.size();i++)
+      {
+       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/application/" + appid + "/" + enc(envs[i])); 
+      }    
+    }
+    
+    return [appid,""];
+  }
+
    /**
     * Get a Component version's base component id 
     * @param url Text the url to the DeployHub server
