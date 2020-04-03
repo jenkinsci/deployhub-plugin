@@ -992,7 +992,7 @@ class deployhub
       }
     }
 
-    return [envid, ""]
+    return [envid, ""];
   }
 
   /**
@@ -1000,8 +1000,8 @@ class deployhub
     * @param url Text the url to the DeployHub server
     * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
-    * @param servername Text the ednpoint name
-    * @param serverattrs Map the ednpoint attributes to assign
+    * @param servername Text the endpoint name
+    * @param serverattrs Map the endpoint attributes to assign
     * @return Boolean success/failure
     **/
 
@@ -1050,6 +1050,71 @@ class deployhub
 
     return [serverid, "${url}/dmadminweb/API/new/server/" + enc(servername) + "?" + attr_str];
 
+  }
+
+  /**
+    * Assign Endpoints to Environment
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param envname Text the environment name
+    * @param servers Array the list of enpoints to assign
+    * @return Boolean success/failure
+    **/
+
+  def assignEP2Env(String url, String userid, String pw, String envname, String[] servers)
+  {
+
+    def envid = 0;
+    def data;
+
+    def domain = "";
+    if (envname.indexOf('.') >= 0)
+    {
+     def parts = envname.tokenize('.');
+     if (parts.size() > 0)
+        parts.remove( parts.size() - 1 );
+     domain = parts.join('.');
+     domain="domain=" + enc(domain);
+     envname = envname.tokenize('.').last();
+    }
+
+    data = getEnvironment(url, userid, pw, envname);
+    envid = data;
+
+    noServers = -1;
+
+    if(servers != null)
+    {
+      noServers = 0;
+      for (def i=0;i<servers.size();i++)
+      {
+        def serverid = getEndpoint(url, userid, pw, servers[i]);
+        if(serverid < 0)
+        {
+          noServers = noServers + 1;
+        }
+      }
+    }
+
+    if(envid >= 0)
+    {
+      if(noServers == 0) {
+        for (def i=0;i<servers.size();i++)
+        {
+          data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/server/" + enc(servers[i]) + "/" + enc(envname));
+        }
+      }
+      else
+      {
+        return [false, envid, servers[i], "Some endpoints does not exist"];
+      }
+    }
+    else {
+      return [false, envid, servers[i], "Environment does not exists"];
+    }
+
+    return [true, envid, servers, "Endpoints assigned to Environment"];
   }
 
   /**
