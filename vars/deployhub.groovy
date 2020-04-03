@@ -1107,11 +1107,11 @@ class deployhub
       }
       else
       {
-        return [false, envid, servers[i], "Some endpoints does not exist"];
+        return [false, envid, servers, "Some endpoints does not exist"];
       }
     }
     else {
-      return [false, envid, servers[i], "Environment does not exists"];
+      return [false, envid, servers, "Environment does not exists"];
     }
 
     return [true, envid, servers, "Endpoints assigned to Environment"];
