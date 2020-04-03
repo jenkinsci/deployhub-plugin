@@ -1082,7 +1082,7 @@ class deployhub
     data = getEnvironment(url, userid, pw, envname);
     envid = data;
 
-    noServers = -1;
+    def noServers = -1;
 
     if(servers != null)
     {
