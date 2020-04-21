@@ -1009,6 +1009,7 @@ class deployhub
   {
     def serverid = 0;
     def data;
+    def orgServerName = servername;
 
     def domain = "";
     if (servername.indexOf('.') >= 0)
@@ -1021,34 +1022,25 @@ class deployhub
      servername = servername.tokenize('.').last();
     }
 
-    def count = 0;
-    def attr_str = "" + domain + "&";
-
-    serverattrs.eachWithIndex
-    {
-      key,value,index ->
-      if (value == null)
-        value = ""
-
-      if (count == 0)
-        attr_str = attr_str + enc(key) + "=" + enc(value);
-      else
-        attr_str = attr_str + "&" + enc(key) + "=" + enc(value);
-
-      count = count + 1;
-    }
-
     serverid = getEndpoint(url, userid, pw, servername);
 
     if(serverid < 0) {
-      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/server/" + enc(servername) + "?" + attr_str);
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/server/" + enc(servername)+ "?" + domain);
       if (data.success)
       {
         serverid = getEndpoint(url, userid, pw, servername);
       }
     }
 
-    return [serverid, "${url}/dmadminweb/API/new/server/" + enc(servername) + "?" + attr_str];
+    if(serverid >= 0) {
+      data = updateEndpointAttrs(url, userid, pw, orgServerName, serverattrs);
+
+      if(data[0]) {
+        return [serverid, "New endpoint created", "Success: " + data.toString()];
+      }
+    }
+
+    return [serverid, "New endpoint creation failed", "Error: " + data.toString()];
 
   }
 
