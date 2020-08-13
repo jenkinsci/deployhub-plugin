@@ -1110,6 +1110,46 @@ class deployhub
   }
 
   /**
+    * Assign Application version to Environment
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param appname Text the application name
+    * @param appversion Text the version of the application
+    * @param env environment name
+    * @return array [appid, message]
+  **/
+  def assignApp2Env(String url, String userid, String pw, String appname, String appversion, String env)
+  {
+    appversion = cleanName(appversion);
+
+    def appid = 0;
+    def data;
+
+    def domain = ""
+    if (appname.indexOf('.') >= 0)
+    {
+     def parts = appname.tokenize('.');
+     if (parts.size() > 0)
+        parts.remove( parts.size() - 1 );
+     domain = parts.join('.');
+     domain="domain=" + enc(domain);
+     appname = appname.tokenize('.').last();
+    }
+
+    // Get App Version
+    data = getApplication(url, userid, pw, appname, appversion);
+    appid = data[0];
+
+    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/application/" + appid + "/" + enc(env));
+
+    if(!data.success)
+      return [-1, data.error];
+
+    return [appid, "application assigned to environment"];
+  }
+
+  /**
     * New Application Version
     * @param url Text the url to the DeployHub server
     * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
