@@ -944,7 +944,213 @@ class deployhub
   }
 
   /**
-    * New Application Version  
+    * New Environment
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param envname Text the environment name
+    * @param envs String Array the servers to assign
+    * @return Boolean success/failure
+    **/
+
+  def newEnvironment(String url, String userid, String pw, String envname, String[] servers)
+  {
+    def envid = 0;
+    def data;
+
+    def domain = "";
+    if (envname.indexOf('.') >= 0)
+    {
+     def parts = envname.tokenize('.');
+     if (parts.size() > 0)
+        parts.remove( parts.size() - 1 );
+     domain = parts.join('.');
+     domain="domain=" + enc(domain);
+     envname = envname.tokenize('.').last();
+    }
+
+    data = getEnvironment(url, userid, pw, envname);
+    envid = data;
+
+    if(envid < 0)
+    {
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/environment/" + enc(envname) + "?" + domain);
+      if (data.success)
+      {
+        envid = getEnvironment(url, userid, pw, envname);
+      }
+    }
+
+    if(servers != null) {
+      for (def i=0;i<servers.size();i++)
+      {
+        def serverid = getEndpoint(url, userid, pw, servers[i]);
+        if(serverid >= 0)
+        {
+          data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/server/" + enc(servers[i]) + "/" + enc(envname));
+        }
+      }
+    }
+
+    return [envid, ""];
+  }
+
+  /**
+    * New Endpoint
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param servername Text the endpoint name
+    * @param serverattrs Map the endpoint attributes to assign
+    * @return Boolean success/failure
+    **/
+
+  def newEndpoint(String url, String userid, String pw, String servername, Map serverattrs)
+  {
+    def serverid = 0;
+    def data;
+    def orgServerName = servername;
+
+    def domain = "";
+    if (servername.indexOf('.') >= 0)
+    {
+     def parts = servername.tokenize('.');
+     if (parts.size() > 0)
+        parts.remove( parts.size() - 1 );
+     domain = parts.join('.');
+     domain="domain=" + enc(domain);
+     servername = servername.tokenize('.').last();
+    }
+
+    serverid = getEndpoint(url, userid, pw, servername);
+
+    if(serverid < 0) {
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/server/" + enc(servername)+ "?" + domain);
+      if (data.success)
+      {
+        serverid = getEndpoint(url, userid, pw, servername);
+      }
+    }
+
+    if(serverid >= 0) {
+      data = updateEndpointAttrs(url, userid, pw, orgServerName, serverattrs);
+
+      if(data[0]) {
+        return [serverid, "New endpoint created", "Success: " + data.toString()];
+      }
+    }
+
+    return [serverid, "New endpoint creation failed", "Error: " + data.toString()];
+
+  }
+
+  /**
+    * Assign Endpoints to Environment
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param envname Text the environment name
+    * @param servers Array the list of enpoints to assign
+    * @return Boolean success/failure
+    **/
+
+  def assignEP2Env(String url, String userid, String pw, String envname, String[] servers)
+  {
+
+    def envid = 0;
+    def data;
+
+    def domain = "";
+    if (envname.indexOf('.') >= 0)
+    {
+     def parts = envname.tokenize('.');
+     if (parts.size() > 0)
+        parts.remove( parts.size() - 1 );
+     domain = parts.join('.');
+     domain="domain=" + enc(domain);
+     envname = envname.tokenize('.').last();
+    }
+
+    data = getEnvironment(url, userid, pw, envname);
+    envid = data;
+
+    def noServers = -1;
+
+    if(servers != null)
+    {
+      noServers = 0;
+      for (def i=0;i<servers.size();i++)
+      {
+        def serverid = getEndpoint(url, userid, pw, servers[i]);
+        if(serverid < 0)
+        {
+          noServers = noServers + 1;
+        }
+      }
+    }
+
+    if(envid >= 0)
+    {
+      if(noServers == 0) {
+        for (def i=0;i<servers.size();i++)
+        {
+          data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/server/" + enc(servers[i]) + "/" + enc(envname));
+        }
+      }
+      else
+      {
+        return [false, envid, servers, "Some endpoints does not exist"];
+      }
+    }
+    else {
+      return [false, envid, servers, "Environment does not exists"];
+    }
+
+    return [true, envid, servers, "Endpoints assigned to Environment"];
+  }
+
+  /**
+    * Assign Application version to Environment
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param appname Text the application name
+    * @param appversion Text the version of the application
+    * @param env environment name
+    * @return array [appid, message]
+  **/
+  def assignApp2Env(String url, String userid, String pw, String appname, String appversion, String env)
+  {
+    appversion = cleanName(appversion);
+
+    def appid = 0;
+    def data;
+
+    def domain = ""
+    if (appname.indexOf('.') >= 0)
+    {
+     def parts = appname.tokenize('.');
+     if (parts.size() > 0)
+        parts.remove( parts.size() - 1 );
+     domain = parts.join('.');
+     domain="domain=" + enc(domain);
+     appname = appname.tokenize('.').last();
+    }
+
+    // Get App Version
+    data = getApplication(url, userid, pw, appname, appversion);
+    appid = data[0];
+
+    data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/application/" + appid + "/" + enc(env));
+
+    if(!data.success)
+      return [-1, data.error];
+
+    return [appid, "application assigned to environment"];
+  }
+
+  /**
+    * New Application Version
     * @param url Text the url to the DeployHub server
     * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
@@ -1013,9 +1219,9 @@ class deployhub
       if (!data.success)
        return [-1,data.error]; 
 
-      appid = data.result.id;
+     appid = data.result.id;
      }
-    } 
+    }
     else
     {
       // Always create a new app version when appversion passed in is blank
@@ -1026,7 +1232,89 @@ class deployhub
         return [-1,data.error]; 
 
       appid = data.result.id;
-    }  
+    } 
+
+    if (skipIncremental)
+    {
+      for (def i=0;i<envs.size();i++)
+      {
+       data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/application/" + appid + "/" + enc(envs[i])); 
+      }    
+    }
+    
+    return [appid,""];
+  }
+
+  /**
+    * New Application Version From Base Version
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param appname Text the application name
+    * @param appversion Text the version of the application
+    * @param envs String Array the environments the base version should be assigned to
+    * @return Boolean success/failure
+    **/
+
+  def newApplicationFromBase(String url, String userid, String pw, String appname, String appversion, String[] envs)
+  {
+    appversion = cleanName(appversion);
+
+    def appid = 0;
+    def data;
+    def parent_appid = -1;
+
+    def domain = ""
+    if (appname.indexOf('.') >= 0)
+    {
+     def parts = appname.tokenize('.');
+     if (parts.size() > 0)
+        parts.remove( parts.size() - 1 );
+     domain = parts.join('.');
+     domain="domain=" + enc(domain);
+     appname = appname.tokenize('.').last();
+    }
+
+    // Get Base Version
+    data = getApplication(url,userid,pw,appname,"");
+    parent_appid = data[0];
+
+    // Create base version
+    if (parent_appid < 0)
+    {
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/new/application/" + enc(appname) + "?" + domain);
+      if (data.success)
+      {
+       data = getApplication(url,userid,pw,appname,"");
+       parent_appid = data[0];
+      } 
+    }
+
+    if (envs != null)
+    {
+        for (def i=0;i<envs.size();i++)
+        {
+         data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/assign/application/" + enc(appname) + "/" + enc(envs[i])); 
+        }
+    }
+
+    // Refetch parent to get version list
+    // data = getApplication(url,userid,pw,appname,"");
+    // def latest_appid = data[2];
+
+    // Refetch the current app version to see if we need to create it or not
+    data = getApplication(url,userid,pw,appname, appversion);
+    appid = data[0];
+
+    if (appid < 0)
+    {  
+     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + parent_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
+
+     if (!data.success)
+      return [-1,data.error]; 
+
+     appid = data.result.id;
+    }
 
     if (skipIncremental)
     {
