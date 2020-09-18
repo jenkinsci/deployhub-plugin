@@ -1226,7 +1226,7 @@ class deployhub
     {
       // Always create a new app version when appversion passed in is blank
 
-      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + latest_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + latest_appid);
 
       if (!data.success)
         return [-1,data.error]; 
