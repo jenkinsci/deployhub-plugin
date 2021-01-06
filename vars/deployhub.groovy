@@ -892,10 +892,9 @@ class deployhub
     * @param url Text the url to the DeployHub server
     * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
-    * @param compname Text the component name
-    * @param compvariant Text the variant for the component
-    * @param compversion Text the version of the variant
-    * @return component id, "" for not found
+    * @param appname Text the application name
+    * @param appversion Text the version of the application
+    * @return application id, -1 for not found
     **/
 
   def getApplication(String url, String userid, String pw, String appname, String appversion)
@@ -942,6 +941,45 @@ class deployhub
       return [-1, "", -1];
     }
   }
+
+  /**
+    * Get the Application Id for the last successful deployment 
+    * @param url Text the url to the DeployHub server
+    * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
+    * @param pw Text the DeployHub password
+    * @param appname Text the application name
+    * @param appversion Text the version of the application
+    * @return application id, -1 for not found
+    **/
+
+  def getLastSuccessfulAppVersion(String url, String userid, String pw, String appid)
+  {
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/application/" + appid + "?lastsuccess=Y");
+
+    if (data == null)
+      return [-1, "", -1];
+
+    if (data.success)
+    {
+      def appid = data.result.id;
+      def name  = data.result.name;
+      def vlist = data.result.versions;
+      def latest = -1;
+
+      if (vlist != null && vlist.size() > 0 && vlist.last() != null)
+      {
+        latest = vlist.last().id;
+        return [appid, name, latest];
+      }
+      else
+        return [appid, name, appid];
+    }
+    else
+    {
+      return [-1, "", -1];
+    }
+  }
+
 
   /**
     * New Environment
@@ -1157,7 +1195,7 @@ class deployhub
     * @param appname Text the application name
     * @param appversion Text the version of the application
     * @param envs String Array the environments the base version should be assigned to
-    * @return Boolean success/failure
+    * @return array [appid, message]
     **/
 
   def newApplication(String url, String userid, String pw, String appname, String appversion, String[] envs)
@@ -1253,7 +1291,7 @@ class deployhub
     * @param appname Text the application name
     * @param appversion Text the version of the application
     * @param envs String Array the environments the base version should be assigned to
-    * @return Boolean success/failure
+    * @return array [appid, message]
     **/
 
   def newApplicationFromBase(String url, String userid, String pw, String appname, String appversion, String[] envs)
