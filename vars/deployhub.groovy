@@ -952,9 +952,9 @@ class deployhub
     * @return application id, -1 for not found
     **/
 
-  def getLastSuccessfulAppVersion(String url, String userid, String pw, String appid)
+  def getLastSuccessfulAppVersion(String url, String userid, String pw, String applicationid)
   {
-    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/application/" + appid + "?lastsuccess=Y");
+    def data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/application/" + applicationid + "?lastsuccess=Y");
 
     if (data == null)
       return [-1, "", -1];
