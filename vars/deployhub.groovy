@@ -1206,19 +1206,33 @@ class deployhub
     data = getApplication(url,userid,pw,appname,"");
     def latest_appid = data[2];
 
-    // Refetch the current app version to see if we need to create it or not
-    data = getApplication(url,userid,pw,appname, appversion);
-    appid = data[0];
+    if (appversion != null && appversion != "")
+    {
+     // Refetch the current app version to see if we need to create it or not
+     data = getApplication(url,userid,pw,appname, appversion);
+     appid = data[0];
 
-    if (appid < 0)
-    {  
-     data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + latest_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
+     if (appid < 0)
+     {  
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + latest_appid + "/?name=" + enc(appname + ";" + appversion) + "&" + domain);
 
-     if (!data.success)
-      return [-1,data.error]; 
+      if (!data.success)
+       return [-1,data.error]; 
 
      appid = data.result.id;
+     }
     }
+    else
+    {
+      // Always create a new app version when appversion passed in is blank
+
+      data = doGetHttpRequestWithJson(userid, pw, "${url}/dmadminweb/API/newappver/" + latest_appid);
+
+      if (!data.success)
+        return [-1,data.error]; 
+
+      appid = data.result.id;
+    } 
 
     if (skipIncremental)
     {

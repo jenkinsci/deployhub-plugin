@@ -156,7 +156,7 @@ if (location.href.indexOf('is-external=true') == -1) {
                         <tr class="rowColor">
                             <td class="colFirst"><code></code></td>
                             <td class="colLast"><code>java.lang.Object</code></td>
-                            <td class="colLast"><code><strong><a href="#assignComp2App(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Integer, java.lang.Integer, java.lang.Integer)">assignComp2App</a></strong>(java.lang.String url, java.lang.String userid, java.lang.String pw, java.lang.Integer appid, java.lang.Integer compid, java.lang.Integer parent_compid, java.lang.Integer xpos, java.lang.Integer ypos)</code><br>Assign Components to Application Version</td>
+                            <td class="colLast"><code><strong><a href="#approveApplication(java.lang.String, java.lang.String, java.lang.String, java.lang.String)">approveApplication</a></strong>(java.lang.String url, java.lang.String userid, java.lang.String pw, java.lang.String Application)</code><br>Approve the application version for its current pipeline stage</td>
                         </tr>
                         
                         <tr class="altColor">
@@ -312,7 +312,43 @@ if (location.href.indexOf('is-external=true') == -1) {
                         <tr class="rowColor">
                             <td class="colFirst"><code></code></td>
                             <td class="colLast"><code>java.lang.Object</code></td>
+                            <td class="colLast"><code><strong><a href="#newComponentVersion(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, List)">newComponentVersion</a></strong>(java.lang.String url, java.lang.String userid, java.lang.String pw, java.lang.String compname, java.lang.String compvariant, java.lang.String compversion, java.lang.String kind, <a href='../List.html'>List</a> component_items)</code><br>Get the Component Id</td>
+                        </tr>
+                        
+                        <tr class="altColor">
+                            <td class="colFirst"><code></code></td>
+                            <td class="colLast"><code>java.lang.Object</code></td>
+                            <td class="colLast"><code><strong><a href="#newDockerComponent(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer)">newDockerComponent</a></strong>(java.lang.String url, java.lang.String userid, java.lang.String pw, java.lang.String compname, java.lang.String compvariant, java.lang.String compversion, java.lang.Integer parent_compid)</code><br>New Docker Component</td>
+                        </tr>
+                        
+                        <tr class="rowColor">
+                            <td class="colFirst"><code></code></td>
+                            <td class="colLast"><code>java.lang.Object</code></td>
+                            <td class="colLast"><code><strong><a href="#newFileComponent(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, List)">newFileComponent</a></strong>(java.lang.String url, java.lang.String userid, java.lang.String pw, java.lang.String compname, java.lang.String compvariant, java.lang.String compversion, java.lang.Integer parent_compid, <a href='../List.html'>List</a> component_items)</code><br>New Component</td>
+                        </tr>
+                        
+                        <tr class="altColor">
+                            <td class="colFirst"><code></code></td>
+                            <td class="colLast"><code>java.lang.Object</code></td>
+                            <td class="colLast"><code><strong><a href="#setConfig(boolean)">setConfig</a></strong>(boolean skip)</code><br>Set Config Options</td>
+                        </tr>
+                        
+                        <tr class="rowColor">
+                            <td class="colFirst"><code></code></td>
+                            <td class="colLast"><code>java.lang.Object</code></td>
+                            <td class="colLast"><code><strong><a href="#updateApplicationAttrs(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, Map)">updateApplicationAttrs</a></strong>(java.lang.String url, java.lang.String userid, java.lang.String pw, java.lang.String appname, java.lang.String appversion, <a href='../Map.html'>Map</a> Attrs)</code><br>Update the application attrs</td>
+                        </tr>
+                        
+                        <tr class="altColor">
+                            <td class="colFirst"><code></code></td>
+                            <td class="colLast"><code>java.lang.Object</code></td>
                             <td class="colLast"><code><strong><a href="#updateComponentAttrs(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, Map)">updateComponentAttrs</a></strong>(java.lang.String url, java.lang.String userid, java.lang.String pw, java.lang.String compname, java.lang.String compvariant, java.lang.String compversion, <a href='../Map.html'>Map</a> Attrs)</code><br>Update the component attrs</td>
+                        </tr>
+                        
+                        <tr class="rowColor">
+                            <td class="colFirst"><code></code></td>
+                            <td class="colLast"><code>java.lang.Object</code></td>
+                            <td class="colLast"><code><strong><a href="#updateEndpointAttrs(java.lang.String, java.lang.String, java.lang.String, java.lang.String, Map)">updateEndpointAttrs</a></strong>(java.lang.String url, java.lang.String userid, java.lang.String pw, java.lang.String endpointname, <a href='../Map.html'>Map</a> Attrs)</code><br>Update the endpoint attrs</td>
                         </tr>
                         
                         <tr class="altColor">
