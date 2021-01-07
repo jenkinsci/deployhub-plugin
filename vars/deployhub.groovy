@@ -947,8 +947,8 @@ class deployhub
     * @param url Text the url to the DeployHub server
     * @param userid Text the DeployHub userid.  Use @credname to pull from Jenkins Credentials or set to "" to use default credential id "deployhub-creds"
     * @param pw Text the DeployHub password
-    * @param appname Text the application name
-    * @param appversion Text the version of the application
+    * @param appid Text the application id
+    * @param envid Text the environment id to find the last successful deployed app version in
     * @return application id, -1 for not found
     **/
 
