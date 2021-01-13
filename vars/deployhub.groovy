@@ -894,7 +894,7 @@ class deployhub
     * @param pw Text the DeployHub password
     * @param appname Text the application name
     * @param appversion Text the version of the application
-    * @return application id, -1 for not found
+    * @return array [appid of last successfull deploy to env, app name, latest version appid in the version tree]
     **/
 
   def getApplication(String url, String userid, String pw, String appname, String appversion)
@@ -949,7 +949,7 @@ class deployhub
     * @param pw Text the DeployHub password
     * @param appid Text the application id
     * @param envid Text the environment id to find the last successful deployed app version in
-    * @return application id, -1 for not found
+    * @return array [appid of last successfull deploy to env, app name, latest version appid in the version tree]
     **/
 
   def getLastSuccessfulAppVersion(String url, String userid, String pw, String applicationid, String envid)
